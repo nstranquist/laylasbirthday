@@ -1,13 +1,23 @@
 import logo from './logo.svg';
+import { Amplify } from 'aws-amplify';
+import { withAuthenticator } from '@aws-amplify/ui-react';
 import './App.css';
+import '@aws-amplify/ui-react/styles.css';
 
-function App() {
+import awsExports from './aws-exports';
+Amplify.configure(awsExports);
+
+
+function App({ signOut, user }) {
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          Edit <code>src/App.js</code> and save to reload.
+          Hello {user.username}
+        </p>
+        <p>
+          <button onClick={signOut}>Sign Out</button>
         </p>
         <a
           className="App-link"
@@ -22,4 +32,4 @@ function App() {
   );
 }
 
-export default App;
+export default withAuthenticator(App);
