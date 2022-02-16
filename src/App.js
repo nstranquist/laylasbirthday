@@ -1,35 +1,54 @@
-import logo from './logo.svg';
-import { Amplify } from 'aws-amplify';
-import { withAuthenticator } from '@aws-amplify/ui-react';
-import './App.css';
-import '@aws-amplify/ui-react/styles.css';
+import { useState, useEffect } from 'react'
+import styled from 'styled-components'
+import FarmTown from './components/FarmTown'
+import { Amplify, Auth } from "aws-amplify"
+import { Authenticator, AuthState } from "@aws-amplify/ui-react"
+import "./App.css"
+import "@aws-amplify/ui-react/styles.css"
 
-import awsExports from './aws-exports';
-Amplify.configure(awsExports);
+import awsExports from "./aws-exports"
+Amplify.configure(awsExports)
 
+// const components = {
+//   Header,
+//   SignIn: {
+//     Header: SignInHeader,
+//     Footer: SignInFooter
+//   },
+//   Footer
+// };
 
-function App({ signOut, user }) {
+// components={components}
+
+function App() {
+  const [authState, setAuthState] = useState()
+  const [user, setUser] = useState()
+
+  // Add Custom Header:
+  // https://ui.docs.amplify.aws/components/authenticator#customization
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Hello {user.username}
-        </p>
-        <p>
-          <button onClick={signOut}>Sign Out</button>
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <StyledApp className="App">
+      <Authenticator loginMechanisms={['username']} hideSignUp initialState='signIn'>
+        {({ signOut, user }) => (
+          <FarmTown signOut={signOut} user={user} />
+        )}
+      </Authenticator>
+    </StyledApp>
+  )
 }
 
-export default withAuthenticator(App);
+const StyledApp = styled.div`
+.amplify-tabs {
+  display: none;
+}
+.amplify-button[data-variation='primary'] {
+  background: linear-gradient(
+    to right,
+    var(--amplify-colors-green-80),
+    var(--amplify-colors-orange-40)
+  );
+}
+`
+
+export default App

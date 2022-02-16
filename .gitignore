@@ -8,6 +8,9 @@
 amplify/
 amplify-backup/
 
+# we use YARN!!!
+package-lock.json
+
 # testing
 /coverage
 
@@ -45,3 +48,9 @@ amplifytools.xcconfig
 .secret-*
 **.sample
 #amplify-do-not-edit-end
+
+
+# resources
+/public/resources
+/src/assets/air_museum_playground_4k.hdr
+TODO

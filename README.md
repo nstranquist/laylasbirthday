@@ -4,7 +4,7 @@
 
 Ya know the drill ;)
 
-*** Make sure you are using Node 14 to work with amplify. Use `NVM` to switch versions
+\*\*\* Make sure you are using Node 14 to work with amplify. Use `NVM` to switch versions
 
 1. `git clone git@github.com:nstranquist/laylasbirthday.git`
 2. `yarn install`
@@ -14,7 +14,7 @@ Ya know the drill ;)
 
 1. `amplify configure --appId d1s4mgfbl9l4c5 --envName staging` will connect your aws profile and region correctly
 2. `amplify pull --appId d1s4mgfbl9l4c5 --envName staging` to sync up your changes
-    - `amplify pull` will work after your first time configuring. Do this before working, like a `git pull`
+   - `amplify pull` will work after your first time configuring. Do this before working, like a `git pull`
 3. `amplify push` to push your changes up to the cloud. We have `staging` and `production` environments so don't worry about pushing broken code, just try not to :p
 
 ### Authentication

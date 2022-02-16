@@ -1,0 +1,7 @@
+build
+coverage
+.vscode/
+amplify/
+node_modules/
+.husky/
+yarn.lock
