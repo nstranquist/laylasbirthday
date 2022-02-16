@@ -45,15 +45,13 @@ const FarmTown = ({
 
       {/* Overlays */}
       <div className="topbar-overlay">
-        <div className="container">
-          <ul className="topbar-stats-list topbar-left">
-            <li className="topbar-stats-item">Gold: {userState.gold}</li>
-            <li className="topbar-stats-item">XP: {userState.xp}</li>
-          </ul>
-          <ul className="topbar-stats-list topbar-right">
-            <li className="topbar-stats-item topbar-action-item" onClick={toggleHelp}>Help</li>
-          </ul>
-        </div>
+        <ul className="topbar-stats-list topbar-left">
+          <li className="topbar-stats-item">Gold: {userState.gold}</li>
+          <li className="topbar-stats-item">XP: {userState.xp}</li>
+        </ul>
+        <ul className="topbar-stats-list topbar-right">
+          <li className="topbar-stats-item topbar-action-item" onClick={toggleHelp}>Help</li>
+        </ul>
       </div>
       <div className="left-actions-overlay">
         <ul>
@@ -278,15 +276,18 @@ const StyledFarmTown = styled.main`
     padding: 0 6px;
     background: ${brownColors.brown10};
     color: #fff;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
 
     .topbar-stats-list {
+      display: flex;
+      flex-direction: row;
+      align-items: center;  
       list-style: none;
       padding: 0;
       margin: 0;
       height: ${styleConstants.topbarHeight}px;
-      display: flex;
-      flex-direction: row;
-      align-items: center;  
       
       .topbar-stats-item {
         padding: 4px 8px;

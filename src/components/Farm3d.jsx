@@ -47,6 +47,10 @@ export const emptyTile = {
   id: ''
 }
 
+export const MAX_TILES = 225
+export const MAX_TILES_X = 15
+export const MAX_TILES_Y = 15
+
 export const Farm3d = ({
   selectedTile,
   setSelectedTile
@@ -100,11 +104,14 @@ export const Farm3d = ({
         enablePan
         enableRotate={canRotate}
         dampingFactor={0.25}
-        // minPolarAngle={-Math.PI}
-        // maxPolarAngle={-Math.PI}
-        maxZoom={175}
-        minZoom={15}
+        minPolarAngle={0}
+        maxPolarAngle={Math.PI / 2}
+        minDistance={2}
+        maxDistance={30}
         screenSpacePanning
+        // min/max zoom for orthographic camera only
+        minZoom={15}
+        maxZoom={175}
       />
       {/* <MapControls /> */}
 
