@@ -29,7 +29,15 @@ function App() {
 
   return (
     <StyledApp className="App">
-      <Authenticator loginMechanisms={['username']} hideSignUp initialState='signIn'>
+      <Authenticator loginMechanisms={['username']} hideSignUp initialState='signIn'
+        // components={{
+        //   SignIn: {
+        //     Header: (
+        //       .login
+        //     )
+        //   }
+        // }}
+      >
         {({ signOut, user }) => (
           <FarmTown signOut={signOut} user={user} />
         )}
@@ -50,5 +58,6 @@ const StyledApp = styled.div`
   );
 }
 `
+
 
 export default App
