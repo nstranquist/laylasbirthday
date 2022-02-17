@@ -4,6 +4,7 @@ import { OrbitControls, MapControls, Sky, Environment, OrthographicCamera, Html,
 import { nanoid } from '../utils/nanoid'
 import { greenColors } from '../style/colors'
 import CarrotModel from './models/Carrot'
+import PotatoModel from './models/Potato'
 import * as THREE from 'three'
 
 export const GROUND_COLOR = '#3d2814'
@@ -30,7 +31,8 @@ export const cropTypes = ['carrot', 'potato', 'kale', 'egg', 'corn', 'strawberry
 export const buildingTypes = []
 export const cropCodes = [1,2,3,4,5,6,7,8]
 
-export const CARROT_GROWING_SCALE = 0.05
+export const CARROT_SCALE = 0.05
+export const POTATO_SCALE = 0.1
 
 export const generateMockTiles = (length, dimX, dimY) => {
   let tiles = []
@@ -213,9 +215,9 @@ export const CropTile = ({
 
   switch(code) {
     case 1:
-      return <CarrotModel scale={[CARROT_GROWING_SCALE, CARROT_GROWING_SCALE, CARROT_GROWING_SCALE]} />
+      return <CarrotModel scale={[CARROT_SCALE, CARROT_SCALE, CARROT_SCALE]} />
     case 2:
-      return <></>
+      return <PotatoModel scale={[POTATO_SCALE, POTATO_SCALE, POTATO_SCALE]} />
     case 3:
       return <></>
     case 4:
