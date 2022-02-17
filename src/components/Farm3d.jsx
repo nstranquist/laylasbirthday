@@ -6,6 +6,7 @@ import { greenColors } from '../style/colors'
 import CarrotModel from './models/Carrot'
 import PotatoModel from './models/Potato'
 import KaleModel from './models/Kale'
+import EggModel from './models/Egg'
 import * as THREE from 'three'
 
 export const GROUND_COLOR = '#3d2814'
@@ -223,7 +224,7 @@ export const CropTile = ({
     case 3:
       return <KaleModel scale={[KALE_SCALE, KALE_SCALE, KALE_SCALE]} />
     case 4:
-      return <></>
+      return <EggModel scale={[KALE_SCALE, KALE_SCALE, KALE_SCALE]} />
     case 5:
       return <></>
     case 6:
