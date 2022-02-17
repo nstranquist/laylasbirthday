@@ -1,7 +1,9 @@
 import { useState, useEffect, Suspense } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
-import { OrbitControls, MapControls, Sky, Environment, OrthographicCamera, Html, Select } from '@react-three/drei'
+import { Canvas, useFrame, useLoader } from '@react-three/fiber'
+import { OrbitControls, MapControls, Sky, Environment, OrthographicCamera, Html, Select, useGLTF } from '@react-three/drei'
 import { nanoid } from '../utils/nanoid'
+import CarrotModel from './models/Carrot'
+import * as THREE from 'three'
 
 export const GROUND_COLOR = '#3d2814'
 export const GROUND_COLOR_2 = '#654321'
@@ -14,6 +16,7 @@ export const TILE_PADDING = .12
 
 export const tileSchema = {
   id: 'sampleid',
+  plotCode: 0,
   plotType: 'carrot', // the id of the plot, maybe a type enum for 'crop', 'building', etc.
   name: 'tile-5',
   y: 2,
@@ -22,6 +25,8 @@ export const tileSchema = {
 export const plotTypes = ['empty', 'carrot']
 export const cropTypes = ['carrot', /* ... */]
 export const buildingTypes = [/* ... */]
+
+export const CARROT_GROWING_SCALE = 0.05
 
 export const generateMockTiles = (length, dimX, dimY) => {
   let tiles = []
@@ -130,35 +135,70 @@ export const Farm3d = ({
         />
 
       {/* Ground */}
-      <mesh rotation={[-Math.PI/2, 0, 0]} position={[helperGridPos[0],-.1,helperGridPos[2]]}>
-        <planeGeometry args={[dimensions.x + TILE_PADDING,dimensions.y + TILE_PADDING]} />
-        <meshPhongMaterial color={GROUND_COLOR_2} />
-      </mesh>
-      
-      <mesh position={[0,0,0]}>
+      <GroundPlane
+        position={[helperGridPos[0],-.1,helperGridPos[2]]}
+        args={[dimensions.x + TILE_PADDING,dimensions.y + TILE_PADDING]}
+      />
+
+      {/* TODO: Expansion Plots */}
+      {/* ... */}
+
+      <group position={[0,0,0]}>
         {/* <Select
           box
           multiple
           onChange={handleSelectChange}> */}
-          {mockTiles.map(tile => (
-            <mesh
-              castShadow
-              receiveShadow 
-              rotation={[-Math.PI/2,0,0]}
-              position={[tile.x,0,tile.y]}
-              key={`${tile.id}`}
-              onClick={() => handleMeshClick(tile)}
-              onPointerEnter={() => handleMeshEnter(tile.id)}
-              onPointerLeave={() => handleMeshExit()}
-            >
-              <planeGeometry args={[1 - TILE_PADDING, 1 - TILE_PADDING]} />
-              <meshPhongMaterial color={hoveredId === tile.id ? GRASS_COLOR_HIGHLIGHTED : selectedTile.id === tile.id ? GRASS_COLOR_SELECTED : GRASS_COLOR} />
-            </mesh>
-          ))}
+          {mockTiles.map(tile => {
+            const tileColor = hoveredId === tile.id ? GRASS_COLOR_HIGHLIGHTED : selectedTile.id === tile.id ? GRASS_COLOR_SELECTED : GRASS_COLOR
+            return (
+              <group>
+                <CarrotModel scale={[CARROT_GROWING_SCALE, CARROT_GROWING_SCALE, CARROT_GROWING_SCALE]} />
+                <mesh
+                  castShadow
+                  receiveShadow 
+                  rotation={[-Math.PI/2,0,0]}
+                  position={[tile.x,0,tile.y]}
+                  key={`${tile.id}`}
+                  onClick={() => handleMeshClick(tile)}
+                  onPointerEnter={() => handleMeshEnter(tile.id)}
+                  onPointerLeave={() => handleMeshExit()}
+                >
+                  <planeGeometry args={[1 - TILE_PADDING, 1 - TILE_PADDING]} />
+                  {tile.plotCode === 0 ? (
+                    <GrassTile color={tileColor} />
+                  ) : (
+                    <meshPhongMaterial color={tileColor} />
+                  )}
+                </mesh>
+              </group>
+            )
+          })}
         {/* </Select> */}
-      </mesh>
+      </group>
       </Suspense>
 
     </Canvas>
+  )
+}
+
+export const GrassTile = ({ color=GRASS_COLOR }) => {
+  const grassTileMap = useLoader(THREE.TextureLoader, `tiles/grass.png`)
+
+  return (
+    <meshPhongMaterial map={grassTileMap} color={color} />
+  )
+}
+
+export const GroundPlane = ({
+  position,
+  args
+}) => {
+  const dirtTileMap = useLoader(THREE.TextureLoader, `tiles/dirt-2.jpg`)
+
+  return (
+    <mesh rotation={[-Math.PI/2, 0, 0]} position={position}>
+      <planeGeometry args={args} />
+      <meshPhongMaterial map={dirtTileMap} color={GROUND_COLOR_2} />
+    </mesh>
   )
 }

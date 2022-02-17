@@ -33,3 +33,21 @@ will update when more information is ready
 ### Lambdas
 
 will fill more in here when appropriate
+
+
+### 3D STUFF
+
+#### Loading Models and Preparing them
+
+[This helped me a lot](https://blog.logrocket.com/configure-3d-models-react-three-fiber/)
+
+Prerequisite: Install this package globally: `npm install -g gltf-pipeline`
+
+Steps (if starting with uncompressed gltf model):
+1. Convert gltf to glb: `gltf-pipeline -i <source file> -o <output file>`
+   example: `gltf-pipeline -i shoe.gltf -o shoe.glb`
+2. (optional) Compress the model: `gltf-pipeline -i <source file> -o <output file> --draco.compressionLevel=10`
+3. Generate the JSX markup: `npx gltfjsx <glTF model source file>`
+   example: `npx gltfjsx shoe-draco.gltf`
+4. Import the component and use as a model in your app!
+   Use this loader: `import { useGLTF } from '@react-three/drei/useGLTF'`

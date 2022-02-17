@@ -46,7 +46,10 @@ const FarmTown = ({
       {/* Overlays */}
       <div className="topbar-overlay">
         <ul className="topbar-stats-list topbar-left">
-          <li className="topbar-stats-item">Gold: {userState.gold}</li>
+          <li className="topbar-stats-item icon-item">
+            <img src={'/ui-icons/coin.png'} height={30} width={30} alt="gold icon" />
+            <span className="item-text">Gold: {userState.gold}</span>
+          </li>
           <li className="topbar-stats-item">XP: {userState.xp}</li>
         </ul>
         <ul className="topbar-stats-list topbar-right">
@@ -295,6 +298,20 @@ const StyledFarmTown = styled.main`
         border: 1px solid #fff;
         text-align: center;
         cursor: pointer;
+      }
+      .icon-item {
+        display: flex;
+        align-items: center;
+
+        .item-text {
+          display: inline-block;
+          margin-left: 3px;
+        }
+      }
+      .topbar-action-item {
+        &:hover {
+          text-decoration: underline;
+        }
       }
     }
   }
