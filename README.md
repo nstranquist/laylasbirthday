@@ -51,3 +51,8 @@ Steps (if starting with uncompressed gltf model):
    example: `npx gltfjsx shoe-draco.gltf`
 4. Import the component and use as a model in your app!
    Use this loader: `import { useGLTF } from '@react-three/drei/useGLTF'`
+
+
+### Art Resources
+
+SVG images were mostly found [Here at SVG Repo](https://www.svgrepo.com)

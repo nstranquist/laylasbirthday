@@ -1,12 +1,5 @@
 // Import SVG
 import { ReactComponent as CarrotSvg } from '../assets/crops/carrot.svg'
-import { ReactComponent as BlueberrySvg } from '../assets/crops/blueberries.svg'
-import { ReactComponent as StrawberrySvg } from '../assets/crops/strawberry.svg'
-import { ReactComponent as CornSvg } from '../assets/crops/corn.svg'
-import { ReactComponent as KaleSvg } from '../assets/crops/kale.svg'
-import { ReactComponent as PotatoSvg } from '../assets/crops/potato.svg'
-import { ReactComponent as EggSvg } from '../assets/crops/egg.svg'
-import { ReactComponent as HeckberrySvg } from '../assets/crops/heckberry.svg'
 
 
 /**
@@ -36,7 +29,7 @@ export const crops = {
     xp: 50,
     time: 15,
     gold: 25,
-    SvgImage: PotatoSvg
+    SvgImage: PotatoSvg // non-existant just yet.
   },
   kale: {
     id: "kale",
@@ -45,7 +38,7 @@ export const crops = {
     xp: 50,
     time: 15,
     gold: 25,
-    SvgImage: KaleSvg
+    SvgImage: KaleSvg // non-existant just yet.
   },
   egg: {
     id: "egg",
@@ -54,7 +47,7 @@ export const crops = {
     xp: 100,
     time: 15,
     gold: 25,
-    SvgImage: EggSvg
+    SvgImage: EggSvg // non-existant just yet.
   },
   corn: {
     id: "corn",
@@ -63,7 +56,7 @@ export const crops = {
     xp: 5,
     time: 3,
     gold: 5,
-    SvgImage: CornSvg
+    SvgImage: CornSvg // non-existant just yet.
   },
   strawberry: {
     id: "strawberry",
@@ -72,7 +65,7 @@ export const crops = {
     xp: 80,
     time: 20,
     gold: 30,
-    SvgImage: StrawberrySvg
+    SevImage: StrawberrySvg
   },
   blueberry: {
     id: "blueberry",
@@ -81,7 +74,7 @@ export const crops = {
     xp: 80,
     time: 20,
     gold: 30,
-    SvgImage: BlueberrySvg
+    SvgImage: BlueberrySvg // non-existant just yet.
   },
   heckberry: {
     id: "heckberry",
@@ -90,7 +83,9 @@ export const crops = {
     xp: () => (Math.random()*200),
     time: () => (Math.random()*30),
     gold: 15,
-    SvgImage: HeckberrySvg // Make it like a huckleberry or something.
+    SvgImage: HeckberrySvg // non-existant just yet. Make it like a huckleberry or something.
   }
+
+
   // ...
 }
