@@ -49,7 +49,7 @@ export const CropSelection = ({
           <li className={"bottom-bar-actions-item noselect primary-button"}
             onClick={() => buildPlot(cropItem.code, cropItem.id)}
           >
-            Build {cropItem.name}
+            Plant {cropItem.name}
           </li>
         </ul>
       </div>

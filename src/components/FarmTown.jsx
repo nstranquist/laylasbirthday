@@ -5,7 +5,7 @@ import styleConstants from '../utils/style_constants'
 import { emptyTile, generateMockTiles } from './Farm3d'
 import { brownColors } from '../style/colors'
 import classnames from 'classnames'
-// import { crops } from '../data/cropsWiki'
+import { crops } from '../data/cropsWiki'
 import { HelpDisplay } from './Help'
 import { ProfileDisplay } from './Profile'
 import { BottomBar } from './BottomBar/BottomBar'
@@ -62,6 +62,8 @@ const FarmTown = ({
   const buildPlot = (tileCode, tileType) => {
     if(!selectedTile?.id) return;
     if(selectedTile.plotCode === 1) return;
+    if(!crops[tileType]) return
+    if(crops[tileType].level > userState.level) return;
 
     setMockTiles(prevTiles => {
       return prevTiles.map(tile => {
@@ -73,6 +75,16 @@ const FarmTown = ({
         return tile;
       })
     })
+
+    const { gold, xp, time } = crops[tileType]
+
+    setUserState(prev => ({
+      ...prev,
+      gold: prev.gold + gold,
+      xp: prev.xp + xp,
+    }))
+
+    // Set Timer
   }
 
   const clearPlot = () => {
@@ -319,7 +331,6 @@ const StyledFarmTown = styled.main`
       .topbar-stats-item {
         padding: 4px 8px;
         margin: 0 4px;
-        border: 1px solid #fff;
         text-align: center;
         cursor: pointer;
       }

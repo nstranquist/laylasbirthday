@@ -39,10 +39,10 @@ export const cropCodes = [1,2,3,4,5,6,7,8]
 
 export const CARROT_SCALE = 0.05
 export const POTATO_SCALE = 0.1
-export const KALE_SCALE = 0.125
-export const CORN_SCALE = 0.35
+export const KALE_SCALE = 0.14
+export const CORN_SCALE = 0.5
 export const STRAWBERRY_SCALE = 0.0015
-export const BLUEBERRY_SCALE = 0.005
+export const BLUEBERRY_SCALE = 0.008
 
 export const generateMockTiles = (length, dimX, dimY) => {
   let tiles = []
@@ -127,7 +127,7 @@ export const Farm3d = ({
         enableRotate={canRotate}
         dampingFactor={0.25}
         minPolarAngle={0}
-        maxPolarAngle={Math.PI / 2}
+        maxPolarAngle={Math.PI / 2 - 0.2}
         minDistance={2}
         maxDistance={30}
         screenSpacePanning

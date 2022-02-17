@@ -17,6 +17,7 @@ import { ReactComponent as HeckberrySvg } from '../assets/crops/heckberry.svg'
  * - gold: 25 (if doing gold?)
  * - clicks: 10 (# of clicks to harvest the crop)
  * - duration(?): (timer until crop finishes)
+ * - could add cost if time...
  */
 
 export const crops = {
