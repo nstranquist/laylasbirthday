@@ -83,13 +83,17 @@ const StyledBottomBar = styled.div`
     }
 
     .bottom-bar-body {
-      padding-top: 1rem;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ddd;
     }
     .farm-details-container {
       display: flex;
       flex-direction: row;
       flex-wrap: wrap;
-      border: 1px solid #fff;
+      /* border: 1px solid #fff; */
 
       .farm-details-left {
         .farm-details-image {
@@ -101,7 +105,7 @@ const StyledBottomBar = styled.div`
           max-height: 100%;
           padding: .4rem;
           margin: auto;
-          border: 1px solid #fff;
+          /* border: 1px solid #fff; */
         }
       }
       .farm-details-right {

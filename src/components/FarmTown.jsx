@@ -32,7 +32,7 @@ const FarmTown = ({
   user,
   signOut
 }) => {
-  const [mockTiles, setMockTiles] = useState(generateMockTiles(9, 3, 3))
+  const [mockTiles, setMockTiles] = useState(generateMockTiles(16, 4, 4))
 
   const [userState, setUserState] = useState(initialUserState)
   const [selectedTile, setSelectedTile] = useState(emptyTile)

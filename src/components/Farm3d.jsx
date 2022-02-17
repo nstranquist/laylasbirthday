@@ -78,8 +78,8 @@ export const Farm3d = ({
   selectedTile,
   setSelectedTile
 }) => {
-  const [helperGridPos, setHelperGridPos] = useState([0, 0, 0])
-  const [dimensions, setDimensions] = useState({ x: 3, y: 3 })
+  const [helperGridPos, setHelperGridPos] = useState([-0.5, 0, -0.5])
+  const [dimensions, setDimensions] = useState({ x: 4, y: 4 })
   const [hoveredId, setHoveredId] = useState('')
   const [canRotate, setCanRotate] = useState(true)
 
