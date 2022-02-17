@@ -8,6 +8,8 @@ import { ReactComponent as CarrotSvg } from '../assets/crops/carrot.svg'
  * - xp: 50,
  * - time: 15 seconds
  * - gold: 25 (if doing gold?)
+ * - clicks: 10 (# of clicks to harvest the crop)
+ * - duration(?): (timer until crop finishes)
  */
 
 export const crops = {

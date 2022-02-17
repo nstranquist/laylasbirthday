@@ -12,3 +12,12 @@ export const brownColors = {
   brown9: '#140d07',
   brown10: '#0a0703',
 }
+
+export const greenColors = {
+  green1: '#316033',
+  green2: '#447741',
+  green3: '#59954A',
+  green4: '#80B145',
+  green5: '#97C14B',
+  green6: '#C6CC51',
+}

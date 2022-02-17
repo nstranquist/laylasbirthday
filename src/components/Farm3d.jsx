@@ -2,15 +2,18 @@ import { useState, useEffect, Suspense } from 'react'
 import { Canvas, useFrame, useLoader } from '@react-three/fiber'
 import { OrbitControls, MapControls, Sky, Environment, OrthographicCamera, Html, Select, useGLTF } from '@react-three/drei'
 import { nanoid } from '../utils/nanoid'
+import { greenColors } from '../style/colors'
 import CarrotModel from './models/Carrot'
 import * as THREE from 'three'
 
 export const GROUND_COLOR = '#3d2814'
 export const GROUND_COLOR_2 = '#654321'
 // export const GRASS_COLOR = '#034B03'
-export const GRASS_COLOR = '#316033'
-export const GRASS_COLOR_HIGHLIGHTED = '#80B145'
-export const GRASS_COLOR_SELECTED = '#59954A'
+
+// TODO: Better Grass Colors (brighter, is better)
+export const GRASS_COLOR_SELECTED = greenColors.green6 //#80B145'//'#316033'
+export const GRASS_COLOR_HIGHLIGHTED = greenColors.green5 // '#80B145'
+export const GRASS_COLOR = greenColors.green3
 
 export const TILE_PADDING = .12
 

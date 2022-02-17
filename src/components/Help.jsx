@@ -43,4 +43,8 @@ const StyledHelpDisplay = styled.div`
       cursor: pointer;
     }
   }
+
+  .help-body-text {
+    
+  }
 `
