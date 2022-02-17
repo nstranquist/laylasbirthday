@@ -5,6 +5,7 @@ import { nanoid } from '../utils/nanoid'
 import { greenColors } from '../style/colors'
 import CarrotModel from './models/Carrot'
 import PotatoModel from './models/Potato'
+import KaleModel from './models/Kale'
 import * as THREE from 'three'
 
 export const GROUND_COLOR = '#3d2814'
@@ -33,6 +34,7 @@ export const cropCodes = [1,2,3,4,5,6,7,8]
 
 export const CARROT_SCALE = 0.05
 export const POTATO_SCALE = 0.1
+export const KALE_SCALE = 0.125
 
 export const generateMockTiles = (length, dimX, dimY) => {
   let tiles = []
@@ -219,7 +221,7 @@ export const CropTile = ({
     case 2:
       return <PotatoModel scale={[POTATO_SCALE, POTATO_SCALE, POTATO_SCALE]} />
     case 3:
-      return <></>
+      return <KaleModel scale={[KALE_SCALE, KALE_SCALE, KALE_SCALE]} />
     case 4:
       return <></>
     case 5:
