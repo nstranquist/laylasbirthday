@@ -7,6 +7,10 @@ import CarrotModel from './models/Carrot'
 import PotatoModel from './models/Potato'
 import KaleModel from './models/Kale'
 import EggModel from './models/Egg'
+import CornModel from './models/Corn'
+import StrawberryModel from './models/Strawberry'
+import BlueberryModel from './models/Blueberry'
+import HeckberryModel from './models/Fancy-grass'
 import * as THREE from 'three'
 
 export const GROUND_COLOR = '#3d2814'
@@ -36,6 +40,9 @@ export const cropCodes = [1,2,3,4,5,6,7,8]
 export const CARROT_SCALE = 0.05
 export const POTATO_SCALE = 0.1
 export const KALE_SCALE = 0.125
+export const CORN_SCALE = 0.35
+export const STRAWBERRY_SCALE = 0.0015
+export const BLUEBERRY_SCALE = 0.005
 
 export const generateMockTiles = (length, dimX, dimY) => {
   let tiles = []
@@ -226,14 +233,14 @@ export const CropTile = ({
     case 4:
       return <EggModel scale={[KALE_SCALE, KALE_SCALE, KALE_SCALE]} />
     case 5:
-      return <></>
+      return <CornModel scale={[CORN_SCALE, CORN_SCALE, CORN_SCALE]} />
     case 6:
-      return <></>
+      return <StrawberryModel scale={[STRAWBERRY_SCALE, STRAWBERRY_SCALE, STRAWBERRY_SCALE]} />
     case 7:
-      return <></>
+      return <BlueberryModel scale={[BLUEBERRY_SCALE, BLUEBERRY_SCALE, BLUEBERRY_SCALE]} />
     case 8:
-      return <></>
+      return <HeckberryModel position={[0, .2, 0]} scale={[KALE_SCALE, KALE_SCALE, KALE_SCALE]} />
     default:
-      return <></>
+      <></>
   }
 }
