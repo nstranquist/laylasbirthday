@@ -5,9 +5,11 @@ import styleConstants from '../utils/style_constants'
 import { emptyTile, generateMockTiles } from './Farm3d'
 import { brownColors } from '../style/colors'
 import classnames from 'classnames'
-import { crops } from '../data/cropsWiki'
+// import { crops } from '../data/cropsWiki'
 import { HelpDisplay } from './Help'
 import { ProfileDisplay } from './Profile'
+import { BottomBar } from './BottomBar/BottomBar'
+import { RightSidebar } from './RightSidebar'
 
 const initialUserState = {
   gold: 0,
@@ -34,10 +36,9 @@ const FarmTown = ({
 
   const [userState, setUserState] = useState(initialUserState)
   const [selectedTile, setSelectedTile] = useState(emptyTile)
-  const [showBottomBar, setShowBottomBar] = useState(true)
   const [showHelp, setShowHelp] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
-  const [showInventory, setShowInventory] = useState(true)
+  const [showInventory, setShowInventory] = useState(false)
   const [selectedInventorySlot, setSelectedInventorySlot] = useState(-1)
 
   const [inventory, setInventory] = useState(generateInventory(INVENTORY_SLOTS))
@@ -49,9 +50,6 @@ const FarmTown = ({
   // Active tile actions
   const cancelTileAction = () => setSelectedTile(emptyTile)
 
-  const closeBottomBar = () => setShowBottomBar(false)
-  const openBottomBar = () => setShowBottomBar(true)
-
   const toggleHelp = () => setShowHelp(true)
   const closeHelp = () => setShowHelp(false)
 
@@ -61,15 +59,15 @@ const FarmTown = ({
   const toggleInventory = () => setShowInventory(true)
   const closeInventory = () => setShowInventory(false)
 
-  const buildCarrot = () => {
+  const buildPlot = (tileCode, tileType) => {
     if(!selectedTile?.id) return;
     if(selectedTile.plotCode === 1) return;
 
     setMockTiles(prevTiles => {
       return prevTiles.map(tile => {
         if(tile.id === selectedTile.id) {
-          tile.plotCode = 1
-          tile.plotType = 'carrot'
+          tile.plotCode = tileCode
+          tile.plotType = tileType
         }
 
         return tile;
@@ -91,6 +89,17 @@ const FarmTown = ({
         return tile;
       })
     })
+  }
+
+  const updateUser = (updates) => {
+    // Check that there are only legal values
+    const foundInvalidUpdate = Object.keys(updates).some(item => !Object.keys(userState).includes(item))
+    if (foundInvalidUpdate) return;
+
+    setUserState(prevState => ({
+      ...prevState,
+      ...updates
+    }))
   }
 
   const selectInventorySlot = index => {
@@ -134,41 +143,12 @@ const FarmTown = ({
       </div>
       <div className="right-sidebar-overlay">
         {showInventory ? (
-          <div className="sidebar-layout-container">
-            <div className="right-sidebar-header">
-              <button className="right-sidebar-toggle-button hide-button" onClick={closeInventory}>Hide Inventory</button>
-              <div className="right-sidebar-profile">
-                <div className="profile-container">
-                  profile
-                </div>
-              </div>
-            </div>
-            <div className="right-sidebar-backpack">
-              <h3 className="right-sidebar-backpack-heading">Items</h3>
-
-              <div className="right-sidebar-inventory-container">
-                {inventory.map((slot, index) => (
-                  <div className={classnames("inventory-item-group", {'selected-slot': selectedInventorySlot === index})} key={`slot-${index}`} onClick={() => selectInventorySlot(index)}>
-                    {slot}
-                    {inventory[index] !== 0 && (
-                      <div className="inventory-slot-item">
-                        {inventory[index].toString()}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="right-sidebar-footer">
-              {selectedInventorySlot >= 0 && (
-                <p className="right-sidebar-footer-text">
-                  Selected slot #{inventory[selectedInventorySlot]}:
-                  {'\n'}
-                  {/* TODO: Get item by its code */}
-                </p>
-              )}
-            </div>
-          </div>
+          <RightSidebar
+            inventory={inventory}
+            selectedInventorySlot={selectedInventorySlot}
+            selectInventorySlot={selectInventorySlot}
+            closeInventory={closeInventory}
+          />
         ) : (
           <div className="right-sidebar-toggle">
             <button className="right-sidebar-toggle-button" onClick={toggleInventory}>Show Inventory</button>
@@ -178,38 +158,12 @@ const FarmTown = ({
 
       {/* Display Info about the plot selected */}
       {selectedTile.id && (
-        <div className={classnames("bottom-bar-overlay", {'bottom-bar-minimized': !showBottomBar})}>
-          <div className="container">
-            <header className="bottom-bar-header">
-              <h3 className="bottom-bar-heading">Plot: {selectedTile.plotType}</h3>
-              {showBottomBar ? <button className="close-button" onClick={closeBottomBar}>Close</button> : <button className="close-button" onClick={openBottomBar}>Show Details</button>}
-            </header>
-            {showBottomBar && (
-              <div className="bottom-bar-body">
-                {/* Render Tile Details, even swap out the right SVG */}
-                <div className="farm-details-container">
-                  <div className="farm-details-left">
-                    <div className="farm-details-image">{<crops.carrot.SvgImage />}</div>
-                  </div>
-                  <div className="farm-details-right">
-                    <h6 className="farm-detail-title">Tile Title Here</h6>
-                    <p className="farm-detail-desc">A small plot of grass hahaha</p>
-                    <p className="farm-detail-desc">x: {selectedTile.x} y: {selectedTile.y}</p>
-                  </div>
-                </div>
-                <ul className="bottom-bar-actions-list">
-                  <li className="bottom-bar-actions-item" onClick={() => cancelTileAction()}>Cancel</li>
-                  {selectedTile?.plotCode === 0 ? (
-                    <li className={"bottom-bar-actions-item noselect"} onClick={() => buildCarrot()}>Build Carrot</li>
-                  ) : (
-                    <li className={"bottom-bar-actions-item noselect"} onClick={() => clearPlot()}>Reset Plot</li>
-                  )}
-                </ul>
-              </div>
-            )}
-            {/* ) : (<div className="bottom-bar-actions-item" onClick={() => cancelTileAction()}>Cancel</div>)} */}
-          </div>
-        </div>
+        <BottomBar
+          selectedTile={selectedTile}
+          cancelTileAction={cancelTileAction}
+          buildPlot={buildPlot}
+          clearPlot={clearPlot}
+        />
       )}
     </StyledFarmTown>
   )
@@ -228,111 +182,6 @@ const StyledFarmTown = styled.main`
     }
   }
 
-  .bottom-bar-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    border: 1px solid #000;
-    min-height: 60px;
-    color: #fff;
-    background: ${brownColors.brown4};
-
-    &.bottom-bar-minimized {
-      
-    }
-
-    /* .bottom-bar-body { */
-    .farm-details-container {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      border: 1px solid #fff;
-
-      .farm-details-left {
-        .farm-details-image {
-          text-align: center;
-          vertical-align: center;
-          align-self: center;
-          width: 6rem;
-          height: 6rem;
-          padding: .4rem;
-          margin: auto;
-          border: 1px solid #fff;
-        }
-      }
-      .farm-details-right {
-        flex: 1;
-
-        .farm-detail-title {
-          margin: 0;
-          margin-bottom: 1rem;
-          font-size: 1.2rem;
-        }
-        .farm-detail-desc {
-          margin: 0;
-          font-size: 1.05rem;
-        }
-      }
-    }
-
-    .bottom-bar-header {
-      width: 100%;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      
-      .bottom-bar-heading {
-        flex: 1;
-        margin: 0;
-        margin-bottom: .75rem;
-        margin-top: .75rem;
-        text-align: left;
-        padding-left: 1rem;
-        color: #fff;
-        font-size: 2.1rem;
-        font-family: sans-serif;
-      }
-
-      .close-button {
-        padding: 0.35rem 1rem;
-        margin: 5px;
-        font-size: 1rem;
-        cursor: pointer;
-      }
-    }
-
-    .bottom-bar-actions-list {
-      list-style: none;
-      margin: 0;
-      margin-top: 1rem;
-      padding-left: 0;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
-      height: 100%;
-
-      .bottom-bar-actions-item {
-        height: 100%;
-        border: 1px solid #fff;
-        display: inline-block;
-        cursor: pointer;
-        padding: 0.7rem 1rem;
-        font-size: 1.2rem;
-        margin: 4px .5rem;
-        border-radius: 8px;
-        transition: .05s ease-in-out;
-
-        &:hover {
-          background: #fff;
-          color: ${brownColors.brown10};
-          transition: .1s ease-in-out;
-        }
-      }
-    }
-  }
   .right-sidebar-overlay {
     position: absolute;
     right: 0;

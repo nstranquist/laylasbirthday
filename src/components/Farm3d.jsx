@@ -25,9 +25,10 @@ export const tileSchema = {
   y: 2,
   x: 1
 }
-export const plotTypes = ['empty', 'carrot']
-export const cropTypes = ['carrot', /* ... */]
-export const buildingTypes = [/* ... */]
+export const plotTypes = ['empty', 'carrot', 'potato', 'kale', 'egg', 'corn', 'strawberry', 'blueberry', 'heckberry']
+export const cropTypes = ['carrot', 'potato', 'kale', 'egg', 'corn', 'strawberry', 'blueberry', 'heckberry']
+export const buildingTypes = []
+export const cropCodes = [1,2,3,4,5,6,7,8]
 
 export const CARROT_GROWING_SCALE = 0.05
 
@@ -156,7 +157,7 @@ export const Farm3d = ({
             const tileColor = hoveredId === tile.id ? GRASS_COLOR_HIGHLIGHTED : selectedTile.id === tile.id ? GRASS_COLOR_SELECTED : GRASS_COLOR
             return (
               <group position={[tile.x,0,tile.y]} key={`${tile.id}`}>
-                {tile.plotCode === 1 && <CarrotModel scale={[CARROT_GROWING_SCALE, CARROT_GROWING_SCALE, CARROT_GROWING_SCALE]} />}
+                {tile.plotCode !== 0 && <CropTile code={tile.plotCode} />}
                 <mesh
                   castShadow
                   receiveShadow 
@@ -204,4 +205,30 @@ export const GroundPlane = ({
       <meshPhongMaterial map={dirtTileMap} color={GROUND_COLOR_2} />
     </mesh>
   )
+}
+
+export const CropTile = ({
+  code
+}) => {
+
+  switch(code) {
+    case 1:
+      return <CarrotModel scale={[CARROT_GROWING_SCALE, CARROT_GROWING_SCALE, CARROT_GROWING_SCALE]} />
+    case 2:
+      return <></>
+    case 3:
+      return <></>
+    case 4:
+      return <></>
+    case 5:
+      return <></>
+    case 6:
+      return <></>
+    case 7:
+      return <></>
+    case 8:
+      return <></>
+    default:
+      return <></>
+  }
 }

@@ -24,72 +24,88 @@ export const crops = {
     id: 'carrot', // or uuid from dynamo lol
     name: "Carrot",
     desc: "Since ancient times, this cruchy munchy attracts bunnies and boosts eyesight.",
+    code: 1,
     xp: 50,
     time: 15,
     gold: 25,
+    level: 1,
     SvgImage: CarrotSvg // relative path, or s3 path to the svg, or... react component?
   },
   potato: {
     id: 'potato',
-    name: "Carrot",
+    name: "Potato",
     desc: "With 100+ types, the potato is most versatile. Often used to describe a block head and dehydrate you.",
+    code: 2,
     xp: 50,
     time: 15,
     gold: 25,
+    level: 2,
     SvgImage: PotatoSvg
   },
   kale: {
     id: "kale",
     name: "Kale",
     desc: "Mmm, a leaf tasting worse than bitter tea. Unless cooked of course, then it's fantastic.",
+    code: 3,
     xp: 50,
     time: 15,
     gold: 25,
+    level: 3,
     SvgImage: KaleSvg
   },
   egg: {
     id: "egg",
     name: "Egg",
     desc: "No one ever tell you have to grow eggs? Such a shame. Much simpler than using chickens...",
+    code: 4,
     xp: 100,
     time: 15,
     gold: 25,
+    level: 4,
     SvgImage: EggSvg
   },
   corn: {
     id: "corn",
     name: "Corn",
     desc: "Tall and useless. Not sure why we grow these things... Don't run into aliens roaming the fields.",
+    code: 5,
     xp: 5,
     time: 3,
     gold: 5,
+    level: 5,
     SvgImage: CornSvg
   },
   strawberry: {
     id: "strawberry",
     name: "Strawberry",
     desc: "Juicy, red, sweet, scrumptious, delectable, luscious, succulent little morsels!",
+    code: 6,
     xp: 80,
     time: 20,
     gold: 30,
+    level: 6,
     SvgImage: StrawberrySvg
   },
   blueberry: {
     id: "blueberry",
     name: "Blueberry",
     desc: "Almost as much to say about it as the strawberry. Some might argue it better, but it doesn't go with as many other things. I rest my case.",
+    code: 7,
     xp: 80,
     time: 20,
     gold: 30,
+    level: 7,
     SvgImage: BlueberrySvg
   },
   heckberry: {
     id: "heckberry",
     name: "Heckberry",
     desc: "Heck is this? After close evaluation, it seems this is the strange fruit of the mystery tree only found in labs! It is said to have unpredictable effects :O",
-    xp: () => (Math.random()*200),
-    time: () => (Math.random()*30),
+    code: 8,
+    xp: Math.floor(Math.random()*200 + 50),
+    time: Math.floor(Math.random()*30 + 10),
     gold: 15,
+    level: 8,
     SvgImage: HeckberrySvg // Make it like a huckleberry or something.
   }
   // ...
