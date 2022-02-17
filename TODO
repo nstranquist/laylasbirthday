@@ -1,0 +1,21 @@
+Load SVG
+
+[-] Center and Space Grid of Farm Plots
+  [ ] Apply logic for centering when even/odd dimensions. Need -0.5 offset for even, 0 for odd
+[x] Raycasting to highlight / select a given component
+
+Background Environment
+
+Add code and logic from Farm.js into Farm3d
+
+Add cool font family
+
+Load the 3D Farm Model in the loading screen
+
+Add a gradient where it makes sense
+
+SVG Button would be SICK!
+
+Toggle Backup visible / hidden, to support smaller screen sizes
+
+Add clicks for growing the crops

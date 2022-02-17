@@ -16,7 +16,7 @@ export const TILE_PADDING = .12
 
 export const tileSchema = {
   id: 'sampleid',
-  plotCode: 0,
+  plotCode: 1,
   plotType: 'carrot', // the id of the plot, maybe a type enum for 'crop', 'building', etc.
   name: 'tile-5',
   y: 2,
@@ -57,10 +57,11 @@ export const MAX_TILES_X = 15
 export const MAX_TILES_Y = 15
 
 export const Farm3d = ({
+  mockTiles,
+  setMockTiles,
   selectedTile,
   setSelectedTile
 }) => {
-  const [mockTiles, setMockTiles] = useState(generateMockTiles(9, 3, 3))
   const [helperGridPos, setHelperGridPos] = useState([0, 0, 0])
   const [dimensions, setDimensions] = useState({ x: 3, y: 3 })
   const [hoveredId, setHoveredId] = useState('')
@@ -151,24 +152,23 @@ export const Farm3d = ({
           {mockTiles.map(tile => {
             const tileColor = hoveredId === tile.id ? GRASS_COLOR_HIGHLIGHTED : selectedTile.id === tile.id ? GRASS_COLOR_SELECTED : GRASS_COLOR
             return (
-              <group>
-                <CarrotModel scale={[CARROT_GROWING_SCALE, CARROT_GROWING_SCALE, CARROT_GROWING_SCALE]} />
+              <group position={[tile.x,0,tile.y]} key={`${tile.id}`}>
+                {tile.plotCode === 1 && <CarrotModel scale={[CARROT_GROWING_SCALE, CARROT_GROWING_SCALE, CARROT_GROWING_SCALE]} />}
                 <mesh
                   castShadow
                   receiveShadow 
                   rotation={[-Math.PI/2,0,0]}
-                  position={[tile.x,0,tile.y]}
-                  key={`${tile.id}`}
                   onClick={() => handleMeshClick(tile)}
                   onPointerEnter={() => handleMeshEnter(tile.id)}
                   onPointerLeave={() => handleMeshExit()}
                 >
                   <planeGeometry args={[1 - TILE_PADDING, 1 - TILE_PADDING]} />
-                  {tile.plotCode === 0 ? (
+                  {/* {tile.plotCode === 0 ? ( */}
                     <GrassTile color={tileColor} />
-                  ) : (
-                    <meshPhongMaterial color={tileColor} />
-                  )}
+                  {/* )
+                  //  : (
+                  //   <meshPhongMaterial color={tileColor} />
+                  // )} */}
                 </mesh>
               </group>
             )

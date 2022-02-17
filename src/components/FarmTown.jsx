@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { Farm3d } from './Farm3d'
 import styleConstants from '../utils/style_constants'
-import { emptyTile } from './Farm3d'
+import { emptyTile, generateMockTiles } from './Farm3d'
 import { brownColors } from '../style/colors'
 import classnames from 'classnames'
 import { crops } from '../data/cropsWiki'
@@ -18,6 +18,8 @@ const FarmTown = ({
   user,
   signOut
 }) => {
+  const [mockTiles, setMockTiles] = useState(generateMockTiles(9, 3, 3))
+
   const [userState, setUserState] = useState(initialUserState)
   const [selectedTile, setSelectedTile] = useState(emptyTile)
   const [showBottomBar, setShowBottomBar] = useState(true)
@@ -36,12 +38,44 @@ const FarmTown = ({
   const toggleHelp = () => setShowHelp(true)
   const closeHelp = () => setShowHelp(false)
 
+  const buildCarrot = () => {
+    if(!selectedTile?.id) return;
+    if(selectedTile.plotCode === 1) return;
+
+    setMockTiles(prevTiles => {
+      return prevTiles.map(tile => {
+        if(tile.id === selectedTile.id) {
+          tile.plotCode = 1
+          tile.plotType = 'carrot'
+        }
+
+        return tile;
+      })
+    })
+  }
+
+  const clearPlot = () => {
+    if(!selectedTile?.id) return;
+    if(selectedTile.plotCode === 0) return;
+
+    setMockTiles(prevTiles => {
+      return prevTiles.map(tile => {
+        if(tile.id === selectedTile.id) {
+          tile.plotCode = 0
+          tile.plotType = 'empty'
+        }
+
+        return tile;
+      })
+    })
+  }
+
   return (
     <StyledFarmTown className={classnames({'no-pointer-events': showHelp})}>
       {showHelp && <HelpDisplay closeHelp={closeHelp} />}
 
       {/* <WelcomeHeader user={user} signOut={signOut} /> */}
-      <Farm3d selectedTile={selectedTile} setSelectedTile={setSelectedTile} />
+      <Farm3d selectedTile={selectedTile} setSelectedTile={setSelectedTile} mockTiles={mockTiles} setMockTiles={setMockTiles} />
 
       {/* Overlays */}
       <div className="topbar-overlay">
@@ -54,6 +88,7 @@ const FarmTown = ({
         </ul>
         <ul className="topbar-stats-list topbar-right">
           <li className="topbar-stats-item topbar-action-item" onClick={toggleHelp}>Help</li>
+          <li className="topbar-stats-item topbar-action-item" onClick={async () => await signOut()}>Log Out</li>
         </ul>
       </div>
       <div className="left-actions-overlay">
@@ -98,7 +133,11 @@ const FarmTown = ({
                 </div>
                 <ul className="bottom-bar-actions-list">
                   <li className="bottom-bar-actions-item" onClick={() => cancelTileAction()}>Cancel</li>
-                  {/* <li className="bottom-bar-actions-item" onClick={() => cancelTileAction()}>Cancel</li> */}
+                  {selectedTile?.plotCode === 0 ? (
+                    <li className={"bottom-bar-actions-item noselect"} onClick={() => buildCarrot()}>Build Carrot</li>
+                  ) : (
+                    <li className={"bottom-bar-actions-item noselect"} onClick={() => clearPlot()}>Reset Plot</li>
+                  )}
                 </ul>
               </div>
             )}
@@ -114,6 +153,14 @@ const StyledFarmTown = styled.main`
   height: 100vh;
   width: 100vw;
   position: relative;
+
+  .disabled-button {
+    cursor: not-allowed !important;
+    &:hover {
+      background: transparent !important;
+      color: #fff !important;
+    }
+  }
 
   .bottom-bar-overlay {
     position: absolute;
