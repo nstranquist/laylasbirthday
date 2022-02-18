@@ -6,10 +6,13 @@ import { emptyTile, generateMockTiles } from './Farm3d'
 import { brownColors } from '../style/colors'
 import classnames from 'classnames'
 import { crops } from '../data/cropsWiki'
-import { HelpDisplay } from './Help'
-import { ProfileDisplay } from './Profile'
+import { HelpDisplay } from './displays/Help'
+import { ProfileDisplay } from './displays/Profile'
+import { CropsDisplay } from './displays/Crops'
+import { BuildingsDisplay } from './displays/Buildings'
 import { BottomBar } from './BottomBar/BottomBar'
 import { RightSidebar } from './RightSidebar'
+import { AnimatedGameText } from './AnimatedGameText'
 
 const initialUserState = {
   gold: 0,
@@ -28,6 +31,8 @@ const generateInventory = (slots) => {
   return arr
 }
 
+const ANIMATED_TEXT_DURATION = 1500
+
 const FarmTown = ({
   user,
   signOut
@@ -39,13 +44,21 @@ const FarmTown = ({
   const [showHelp, setShowHelp] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
   const [showInventory, setShowInventory] = useState(false)
+  const [showBuildings, setShowBuildings] = useState(false)
+  const [showCrops, setShowCrops] = useState(false)
   const [selectedInventorySlot, setSelectedInventorySlot] = useState(-1)
 
   const [inventory, setInventory] = useState(generateInventory(INVENTORY_SLOTS))
 
+  const [animatedText, setAnimatedText] = useState('')
+
   useEffect(() => {
     console.log('welcome to farmtown')
   }, [])
+
+  useEffect(() => {
+    console.log('animated text:', animatedText)
+  }, [animatedText])
 
   // Active tile actions
   const cancelTileAction = () => setSelectedTile(emptyTile)
@@ -78,13 +91,20 @@ const FarmTown = ({
 
     const { gold, xp, time } = crops[tileType]
 
-    setUserState(prev => ({
-      ...prev,
-      gold: prev.gold + gold,
-      xp: prev.xp + xp,
-    }))
+    // setTimer
+    setTimeout(() => {
+      setAnimatedText(`+${gold} Gold!\n+${xp} XP!`)
 
-    // Set Timer
+      setUserState(prev => ({
+        ...prev,
+        gold: prev.gold + gold,
+        xp: prev.xp + xp,
+      }))
+
+      setTimeout(() => {
+        setAnimatedText('')
+      }, ANIMATED_TEXT_DURATION)
+    }, (time * 1000))
   }
 
   const clearPlot = () => {
@@ -122,9 +142,15 @@ const FarmTown = ({
   }
 
   return (
-    <StyledFarmTown className={classnames({'no-pointer-events': showHelp})}>
+    <StyledFarmTown className={classnames({'no-pointer-events': showHelp || showProfile || showCrops || showBuildings})}>
       {showHelp && <HelpDisplay closeHelp={closeHelp} />}
       {showProfile && <ProfileDisplay closeProfile={closeProfile} />}
+      {showCrops && <CropsDisplay closeDisplay={() => setShowCrops(false)} />}
+      {showBuildings && <BuildingsDisplay closeDisplay={() => setShowBuildings(false)} />}
+
+      {animatedText && (
+        <AnimatedGameText text={animatedText.split('\n')} DURATION={ANIMATED_TEXT_DURATION} />
+      )}
 
       <Farm3d selectedTile={selectedTile} setSelectedTile={setSelectedTile} mockTiles={mockTiles} setMockTiles={setMockTiles} />
 
@@ -148,8 +174,8 @@ const FarmTown = ({
       </div>
       <div className="left-actions-overlay">
         <ul>
-          <li style={{background:"rgba(255,255,255,0.75)"}}>Buildings</li>
-          <li style={{background:"rgba(255,255,255,0.75)"}}>Crops</li>
+          <li style={{background:"rgba(255,255,255,0.75)"}} onClick={() => setShowCrops(true)}>Crops</li>
+          <li style={{background:"rgba(255,255,255,0.75)"}} onClick={() => setShowBuildings(true)}>Buildings</li>
           <li style={{background:"rgba(255,255,255,0.75)"}}>Edit Farm</li>
         </ul>
       </div>
@@ -185,6 +211,26 @@ const StyledFarmTown = styled.main`
   height: 100vh;
   width: 100vw;
   position: relative;
+
+  .animated-game-text {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    align-self: center;
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+    z-index: 1040;
+    margin: 0 auto;
+
+    .game-text-item {
+      margin: 0;
+      margin-bottom: 1rem;
+    }
+    .game-text-item:last-child {
+      margin: 0;
+    }
+  }
 
   .disabled-button {
     cursor: not-allowed !important;

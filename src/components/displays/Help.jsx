@@ -1,40 +1,38 @@
 import styled from 'styled-components'
-import { brownColors } from '../style/colors'
+import { brownColors } from '../../style/colors'
 
-export const ProfileDisplay = ({
-  closeProfile,
-  // user,
-  // userState
+export const HelpDisplay = ({
+  closeHelp
 }) => {
 
   return (
-    <StyledProfileDisplay>
-      <div className="close-profile">
-        <button onClick={closeProfile}>Close</button>
+    <StyledHelpDisplay>
+      <div className="close-help">
+        <button onClick={closeHelp}>Close</button>
       </div>
       <div className="container">
-        <h1>Profile</h1>
-        <p className="profile-body-text">
-          Adventurer
+        <h1>Help!!</h1>
+        <p className="help-body-text">
+          You look lost, follow me ;)
         </p>
       </div>
-    </StyledProfileDisplay>
+    </StyledHelpDisplay>
   )
 }
 
-const StyledProfileDisplay = styled.div`
+const StyledHelpDisplay = styled.div`
   position: absolute;
   top: 70px; // 60px + 10px
   bottom: 70px;
   width: 90%;
   left: 5%;
   /* padding: 2rem; */
-  background: rgba(255,255,255,.5); // ${brownColors.brown5};
+  background: rgba(255,255,255,.65); // ${brownColors.brown5};
   border-radius: 1px;
   z-index: 1001;
   pointer-events: all !important;
 
-  .close-profile {
+  .close-help {
     position: fixed;
     top: 70px;
     right: calc(10% + 2rem + 15px);
@@ -46,7 +44,7 @@ const StyledProfileDisplay = styled.div`
     }
   }
 
-  .profile-body-text {
+  .help-body-text {
     
   }
 `

@@ -1,38 +1,38 @@
 import styled from 'styled-components'
-import { brownColors } from '../style/colors'
+import { brownColors } from '../../style/colors'
 
-export const HelpDisplay = ({
-  closeHelp
+export const CropsDisplay = ({
+  closeDisplay
 }) => {
 
   return (
-    <StyledHelpDisplay>
-      <div className="close-help">
-        <button onClick={closeHelp}>Close</button>
+    <StyledCropsDisplay>
+      <div className="close-display">
+        <button onClick={closeDisplay}>Close</button>
       </div>
       <div className="container">
-        <h1>Help!!</h1>
-        <p className="help-body-text">
+        <h1>Crops</h1>
+        <p className="display-body-text">
           You look lost, follow me ;)
         </p>
       </div>
-    </StyledHelpDisplay>
+    </StyledCropsDisplay>
   )
 }
 
-const StyledHelpDisplay = styled.div`
+const StyledCropsDisplay = styled.div`
   position: absolute;
   top: 70px; // 60px + 10px
   bottom: 70px;
   width: 90%;
   left: 5%;
   /* padding: 2rem; */
-  background: rgba(255,255,255,.5); // ${brownColors.brown5};
+  background: rgba(255,255,255,.65); // ${brownColors.brown5};
   border-radius: 1px;
   z-index: 1001;
   pointer-events: all !important;
 
-  .close-help {
+  .close-display {
     position: fixed;
     top: 70px;
     right: calc(10% + 2rem + 15px);
@@ -44,7 +44,7 @@ const StyledHelpDisplay = styled.div`
     }
   }
 
-  .help-body-text {
+  .display-body-text {
     
   }
 `

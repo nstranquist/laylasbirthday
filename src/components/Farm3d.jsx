@@ -1,6 +1,6 @@
 import { useState, useEffect, Suspense } from 'react'
 import { Canvas, useFrame, useLoader } from '@react-three/fiber'
-import { OrbitControls, MapControls, Sky, Environment, OrthographicCamera, Html, Select, useGLTF } from '@react-three/drei'
+import { OrbitControls, Environment, Html} from '@react-three/drei'
 import { nanoid } from '../utils/nanoid'
 import { greenColors } from '../style/colors'
 import CarrotModel from './models/Carrot'
@@ -12,6 +12,7 @@ import StrawberryModel from './models/Strawberry'
 import BlueberryModel from './models/Blueberry'
 import HeckberryModel from './models/Fancy-grass'
 import * as THREE from 'three'
+import { Loader } from './LoaderUI'
 
 export const GROUND_COLOR = '#3d2814'
 export const GROUND_COLOR_2 = '#654321'
@@ -117,7 +118,7 @@ export const Farm3d = ({
       }}
       style={{height:"100%",width:"100%", position: 'absolute'}}
     >
-      <Suspense fallback={<Html>loading farm...</Html>}>
+      <Suspense fallback={<Loader />}>
       {/* <OrthographicCamera makeDefault zoom={50} position={[5, 10, 5, 10]} origin /> */}
 
       <OrbitControls
@@ -129,7 +130,7 @@ export const Farm3d = ({
         minPolarAngle={0}
         maxPolarAngle={Math.PI / 2 - 0.2}
         minDistance={2}
-        maxDistance={30}
+        maxDistance={25}
         screenSpacePanning
         // min/max zoom for orthographic camera only
         minZoom={15}
@@ -147,8 +148,9 @@ export const Farm3d = ({
 
         <Environment
           background // Whether to affect scene.background
-          path={'/'}
-          files={'air_museum_playground_4k.hdr'}
+          // path={'/'}
+          // files={'air_museum_playground_4k.hdr'}
+          preset={'sunset'}
         />
 
       {/* Ground */}
@@ -160,7 +162,7 @@ export const Farm3d = ({
       {/* TODO: Expansion Plots */}
       {/* ... */}
 
-      <group position={[0,0,0]}>
+      <group position={[0,0,0]} castShadow receiveShadow>
         {/* <Select
           box
           multiple
@@ -168,7 +170,7 @@ export const Farm3d = ({
           {mockTiles.map(tile => {
             const tileColor = hoveredId === tile.id ? GRASS_COLOR_HIGHLIGHTED : selectedTile.id === tile.id ? GRASS_COLOR_SELECTED : GRASS_COLOR
             return (
-              <group position={[tile.x,0,tile.y]} key={`${tile.id}`}>
+              <group position={[tile.x,0,tile.y]} key={`${tile.id}`} castShadow receiveShadow>
                 {tile.plotCode !== 0 && <CropTile code={tile.plotCode} />}
                 <mesh
                   castShadow

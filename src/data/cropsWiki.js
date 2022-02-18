@@ -26,9 +26,9 @@ export const crops = {
     name: "Carrot",
     desc: "Since ancient times, this cruchy munchy attracts bunnies and boosts eyesight.",
     code: 1,
-    xp: 50,
-    time: 15,
-    gold: 25,
+    xp: 20,
+    time: 3,
+    gold: 15,
     level: 1,
     SvgImage: CarrotSvg // relative path, or s3 path to the svg, or... react component?
   },
@@ -57,7 +57,7 @@ export const crops = {
   egg: {
     id: "egg",
     name: "Egg",
-    desc: "No one ever tell you have to grow eggs? Such a shame. Much simpler than using chickens...",
+    desc: "No one ever tell you to grow eggs? Such a shame. Much simpler than using chickens...",
     code: 4,
     xp: 100,
     time: 15,
@@ -90,7 +90,7 @@ export const crops = {
   blueberry: {
     id: "blueberry",
     name: "Blueberry",
-    desc: "Almost as much to say about it as the strawberry. Some might argue it better, but it doesn't go with as many other things. I rest my case.",
+    desc: "Almost as much to say about it as the strawberry. Some might argue its better, but it doesn't go with as many other things. I rest my case.",
     code: 7,
     xp: 80,
     time: 20,
