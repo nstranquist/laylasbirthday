@@ -36,7 +36,6 @@ export const RightSidebar = ({
 
     const cropId = codesMap[code]
     const crop = crops[cropId]
-    console.log({code, cropId, crop})
     if(!crop || !crop.SvgImage) return <></>
     return <crop.SvgImage alt={cropId} />
   }

@@ -83,11 +83,6 @@ const FarmTown = ({
   }, [])
 
   useEffect(() => {
-    console.log('timers:', timers)
-  }, [timers])
-
-  useEffect(() => {
-    console.log('animated text:', animatedText)
     if(animatedText) {
       setSettingAnimatedText(true)
       setTimeout(() => {
@@ -158,7 +153,6 @@ const FarmTown = ({
   }
 
   const clearInventorySlot = index => {
-    console.log('index:', index)
     setInventory(prev => {
       prev[index] = 0
       return prev
@@ -251,6 +245,18 @@ const FarmTown = ({
     })
   }
 
+  const getIsActiveTimer = tileId => {
+    // return empty object or actual timer
+    const foundTimer = timers.find(timer => timer.tileId === tileId)
+    return foundTimer ? true : false
+  }
+  const getActiveTimer = tileId => {
+    // return empty object or actual timer
+    const foundTimer = timers.find(timer => timer.tileId === tileId)
+    if(!foundTimer) return {}
+    return foundTimer
+  }
+
   return (
     <StyledFarmTown className={classnames({'no-pointer-events': showHelp || showProfile || showCrops || showBuildings})}>
       {showHelp && <HelpDisplay closeHelp={closeHelp} />}
@@ -293,14 +299,14 @@ const FarmTown = ({
           <div className="right-sidebar-toggle">
             <button className="right-sidebar-toggle-button" onClick={toggleInventory}>Show Inventory</button>
             {timers.map((timer, index) => (
-              <Timer timer={timer} removeTimer={removeTimer} key={`timer-${index}`} />
+              <Timer timer={timer} removeTimer={removeTimer} key={`timer-${index}`} showDebug={false} />
             ))}
           </div>
         )}
       </div>
 
       {/* Display Info about the plot selected */}
-      {selectedTile.id && (
+      {selectedTile?.id && (
         <BottomBar
           selectedTile={selectedTile}
           showInventory={showInventory}
@@ -309,6 +315,9 @@ const FarmTown = ({
           clearPlot={clearPlot}
           cropIndex={cropIndex}
           setCropIndex={setCropIndex}
+          isActiveTimer={getIsActiveTimer(selectedTile.id)}
+          removeTimer={removeTimer}
+          timer={getActiveTimer(selectedTile.id)}
         />
       )}
 
@@ -362,8 +371,8 @@ const StyledFarmTown = styled.main`
   .disabled-button {
     cursor: not-allowed !important;
     &:hover {
-      background: transparent !important;
-      color: #fff !important;
+      background: initial;
+      color: initial;
     }
   }
 
@@ -452,6 +461,19 @@ const StyledFarmTown = styled.main`
           text-decoration: underline;
         }
       }
+    }
+  }
+
+  .timer-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    
+    .timer-text {
+      margin: 0;
+      font-size: 1.2rem;
+      margin-left: 6px;
+      color: #fff;
     }
   }
 

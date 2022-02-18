@@ -80,13 +80,9 @@ export const Farm3d = ({
   selectTile
 }) => {
   const [helperGridPos, setHelperGridPos] = useState([-0.5, 0, -0.5])
-  const [dimensions, setDimensions] = useState({ x: 4, y: 4 })
+  const [dimensions, setDimensions] = useState({ x: 4.35, y: 4.35 })
   const [hoveredId, setHoveredId] = useState('')
   const [canRotate, setCanRotate] = useState(true)
-
-  // useEffect(() => {
-  //   console.log('mock tiles:', mockTiles)
-  // }, [mockTiles])
 
   useEffect(() => {
     if(selectedTile.id)
@@ -155,12 +151,15 @@ export const Farm3d = ({
 
       {/* Ground */}
       <GroundPlane
-        position={[helperGridPos[0],-.1,helperGridPos[2]]}
+        position={[helperGridPos[0],-.05,helperGridPos[2]]}
         args={[dimensions.x + TILE_PADDING,dimensions.y + TILE_PADDING]}
       />
 
-      {/* TODO: Expansion Plots */}
-      {/* ... */}
+      {/* Expand Farm Plane */}
+      {/* <GroundPlane
+        position={[helperGridPos[0],-.12,helperGridPos[2]]}
+        args={[dimensions.x + 2 + TILE_PADDING,dimensions.y + 2 + TILE_PADDING]}
+      /> */}
 
       <group position={[0,0,0]} castShadow receiveShadow>
         {/* <Select
@@ -208,12 +207,13 @@ export const GrassTile = ({ color=GRASS_COLOR }) => {
 
 export const GroundPlane = ({
   position,
-  args
+  args,
+  textureUrl = `tiles/dirt-2.jpg`
 }) => {
-  const dirtTileMap = useLoader(THREE.TextureLoader, `tiles/dirt-2.jpg`)
+  const dirtTileMap = useLoader(THREE.TextureLoader, textureUrl)
 
   return (
-    <mesh rotation={[-Math.PI/2, 0, 0]} position={position}>
+    <mesh rotation={[-Math.PI/2, 0, 0]} position={position} castShadow receiveShadow>
       <planeGeometry args={args} />
       <meshPhongMaterial map={dirtTileMap} color={GROUND_COLOR_2} />
     </mesh>

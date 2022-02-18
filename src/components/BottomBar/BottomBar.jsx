@@ -16,7 +16,9 @@ export const BottomBar = ({
   showInventory,
   buildPlot,
   clearPlot,
-  timeLeft
+  isActiveTimer,
+  removeTimer,
+  timer
 }) => {
   const [cropItem, setCropItem] = useState(crops[cropKeys[0]])
 
@@ -44,7 +46,9 @@ export const BottomBar = ({
             selectedTile={selectedTile}
             resetPlot={resetPlot}
             cancelTileAction={cancelTileAction}
-            timeLeft={timeLeft}
+            isActiveTimer={isActiveTimer}
+            removeTimer={removeTimer}
+            timer={timer}
           />
           ) : (
           <CropSelection

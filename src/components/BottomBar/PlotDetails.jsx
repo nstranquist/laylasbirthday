@@ -1,39 +1,44 @@
-
+import classnames from 'classnames'
+import { Timer } from '../Timer'
 
 export const PlotDetails = ({
   selectedTile,
-  // SvgImage,
   resetPlot,
   cancelTileAction,
-
-  timeLeft
+  isActiveTimer,
+  removeTimer = () => {},
+  timer = {}
 }) => {
 
   return (
     <>
       <header className="bottom-bar-header">
-        <h3 className="bottom-bar-heading">Plot: {selectedTile.plotType}</h3>
+        <h3 className="bottom-bar-heading" style={{textTransform: 'uppercase'}}>{selectedTile.plotType}</h3>
       </header>
 
       <div className="bottom-bar-body">
-        {timeLeft > 0 && (
+        {isActiveTimer ? (
           <div className="farm-details-container" style={{justifyContent:'center'}}>
             <div className="farm-details-center">
-              <p className="farm-detail-text">
-                <img src={'/ui-icons/clock.svg'} height={22} width={22} alt="time" />
-                <span className="farm-detail-stat-text">{Math.ceil(timeLeft)}s</span>
-              </p>
-              {/* <p className="farm-detail-text">{selectedTile.desc}</p> */}
+              <Timer timer={timer} removeTimer={removeTimer} />
+            </div>
+          </div>
+        ) : (
+          <div className="farm-details-container" style={{justifyContent:'center'}}>
+            <div className="farm-details-center" style={{marginBottom:'0.65rem'}}>
+              {/* Harvest Button */}
+              <h4 style={{margin:0,marginBottom:'0.2rem'}}>Status:</h4>
+              <h2 style={{margin:0}}>Harvested</h2>
             </div>
           </div>
         )}
         <ul className="bottom-bar-actions-list">
           <li className="bottom-bar-actions-item" onClick={() => cancelTileAction()}>Cancel</li>
-          {/* {(timeLeft > 0 || !isTimerActive) ? ( */}
-            <li className={"bottom-bar-actions-item noselect primary-button"} onClick={() => resetPlot()}>Reset Plot</li>
-          {/* ) : (
-            <li className={"bottom-bar-actions-item noselect primary-button"} onClick={() => harvestPlot()}>Harvest</li>
-          )} */}
+          <li
+            className={classnames("bottom-bar-actions-item noselect primary-button", {'disabled-button': isActiveTimer})}
+            onClick={() => !isActiveTimer && resetPlot()}>
+            Clear Plot
+          </li>
         </ul>
       </div>
     </>
