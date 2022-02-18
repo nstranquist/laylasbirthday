@@ -2,5 +2,5 @@
 export default {
   topbarHeight: 60,
   // leftSidebarWidth: 100,
-  // rightSidebarWidth: 200,
+  rightSidebarWidth: 200,
 }

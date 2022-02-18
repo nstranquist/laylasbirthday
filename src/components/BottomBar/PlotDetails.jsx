@@ -2,9 +2,11 @@
 
 export const PlotDetails = ({
   selectedTile,
-  SvgImage,
+  // SvgImage,
   resetPlot,
-  cancelTileAction
+  cancelTileAction,
+
+  timeLeft
 }) => {
 
   return (
@@ -14,18 +16,24 @@ export const PlotDetails = ({
       </header>
 
       <div className="bottom-bar-body">
-        {/* <div className="farm-details-container">
-          <div className="farm-details-left">
-            <div className="farm-details-image">{<SvgImage />}</div>
+        {timeLeft > 0 && (
+          <div className="farm-details-container" style={{justifyContent:'center'}}>
+            <div className="farm-details-center">
+              <p className="farm-detail-text">
+                <img src={'/ui-icons/clock.svg'} height={22} width={22} alt="time" />
+                <span className="farm-detail-stat-text">{Math.ceil(timeLeft)}s</span>
+              </p>
+              {/* <p className="farm-detail-text">{selectedTile.desc}</p> */}
+            </div>
           </div>
-          <div className="farm-details-right">
-            <h6 className="farm-detail-title">{selectedTile.name}</h6>
-            <p className="farm-detail-desc">{selectedTile.desc}</p>
-          </div>
-        </div> */}
+        )}
         <ul className="bottom-bar-actions-list">
           <li className="bottom-bar-actions-item" onClick={() => cancelTileAction()}>Cancel</li>
-          <li className={"bottom-bar-actions-item noselect primary-button"} onClick={() => resetPlot()}>Reset Plot</li>
+          {/* {(timeLeft > 0 || !isTimerActive) ? ( */}
+            <li className={"bottom-bar-actions-item noselect primary-button"} onClick={() => resetPlot()}>Reset Plot</li>
+          {/* ) : (
+            <li className={"bottom-bar-actions-item noselect primary-button"} onClick={() => harvestPlot()}>Harvest</li>
+          )} */}
         </ul>
       </div>
     </>

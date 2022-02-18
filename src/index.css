@@ -7,6 +7,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.App {
+  text-align: center;
+}
+button {
+  cursor: pointer;
+}
 
 /* Container Class */
 .container {

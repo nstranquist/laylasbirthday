@@ -1,18 +1,22 @@
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { Farm3d } from './Farm3d'
-import styleConstants from '../utils/style_constants'
-import { emptyTile, generateMockTiles } from './Farm3d'
-import { brownColors } from '../style/colors'
 import classnames from 'classnames'
-import { crops } from '../data/cropsWiki'
-import { HelpDisplay } from './displays/Help'
-import { ProfileDisplay } from './displays/Profile'
-import { CropsDisplay } from './displays/Crops'
-import { BuildingsDisplay } from './displays/Buildings'
+import toast, { Toaster } from 'react-hot-toast'
+
+import { Farm3d, emptyTile, generateMockTiles } from './Farm3d'
+import {
+  HelpDisplay,
+  ProfileDisplay,
+  CropsDisplay,
+  BuildingsDisplay,
+} from './displays'
 import { BottomBar } from './BottomBar/BottomBar'
 import { RightSidebar } from './RightSidebar'
 import { AnimatedGameText } from './AnimatedGameText'
+
+import styleConstants from '../utils/style_constants'
+import { brownColors } from '../style/colors'
+import { crops } from '../data/cropsWiki'
 
 const initialUserState = {
   gold: 0,
@@ -21,7 +25,7 @@ const initialUserState = {
   clicks: 0 // lol
 }
 
-const INVENTORY_SLOTS = 20 // 4x5
+const INVENTORY_SLOTS = 16 // 4x4 // 4x5
 
 const generateInventory = (slots) => {
   let arr = []
@@ -48,9 +52,14 @@ const FarmTown = ({
   const [showCrops, setShowCrops] = useState(false)
   const [selectedInventorySlot, setSelectedInventorySlot] = useState(-1)
 
+  const [timers, setTimers] = useState([])
+
   const [inventory, setInventory] = useState(generateInventory(INVENTORY_SLOTS))
 
   const [animatedText, setAnimatedText] = useState('')
+  const [settingAnimatedText, setSettingAnimatedText] = useState(false)
+
+  const [cropIndex, setCropIndex] = useState(0)
 
   useEffect(() => {
     console.log('welcome to farmtown')
@@ -58,10 +67,24 @@ const FarmTown = ({
 
   useEffect(() => {
     console.log('animated text:', animatedText)
+    if(animatedText) {
+      setSettingAnimatedText(true)
+      setTimeout(() => {
+        if(!settingAnimatedText) {
+          setAnimatedText('')
+          setSettingAnimatedText(false)
+        }
+      }, ANIMATED_TEXT_DURATION)
+    }
   }, [animatedText])
 
   // Active tile actions
   const cancelTileAction = () => setSelectedTile(emptyTile)
+
+  const selectTile = (newValue) => {
+    setSelectedInventorySlot(-1)
+    setSelectedTile(newValue)
+  }
 
   const toggleHelp = () => setShowHelp(true)
   const closeHelp = () => setShowHelp(false)
@@ -71,6 +94,56 @@ const FarmTown = ({
 
   const toggleInventory = () => setShowInventory(true)
   const closeInventory = () => setShowInventory(false)
+
+  const isInventoryFull = () => !inventory.includes(0)
+
+  const getNextInventoryIndex = () => inventory.findIndex(itemCode => itemCode === 0)
+
+  const addInventoryItem = (itemCode) => {
+    // if inventory is full, alert this to the user
+    if(isInventoryFull())
+      return toast.error('Inventory is full')
+
+    // Fill next available inventory index
+    const index = getNextInventoryIndex()
+    setInventory(prev => {
+      prev[index] = itemCode
+      return prev;
+    })
+  }
+
+  const selectInventorySlot = index => {
+    // if other selection is in progress, cancel it, so for now that means resetting the selectedTile
+    setSelectedTile(emptyTile)
+    if(index !== selectedInventorySlot)
+      setSelectedInventorySlot(index)
+    else
+      setSelectedInventorySlot(-1)
+  }
+
+  const sellInventorySlot = (index, gold) => {
+    setUserState(prev => ({ ...prev, gold: prev.gold + gold }))
+    setAnimatedText(`+${gold} Gold!`)
+    clearInventorySlot(index)
+  }
+
+  // taz will +/- the gold earned by factor of 3
+  const feedTazSlot = (index, gold) => {
+    const tazFactor = Math.random() > 0.5 ? -1 : 1
+    gold = Math.floor(gold - (Math.random() * gold * tazFactor))
+    setUserState(prev => ({ ...prev, gold: prev.gold + gold }))
+    setAnimatedText(`+${gold} Gold!`)
+    clearInventorySlot(index)
+  }
+
+  const clearInventorySlot = index => {
+    console.log('index:', index)
+    setInventory(prev => {
+      prev[index] = 0
+      return prev
+    })
+    setSelectedInventorySlot(-1)
+  }
 
   const buildPlot = (tileCode, tileType) => {
     if(!selectedTile?.id) return;
@@ -89,17 +162,20 @@ const FarmTown = ({
       })
     })
 
-    const { gold, xp, time } = crops[tileType]
+    const { gold, xp, time, code } = crops[tileType]
 
     // setTimer
     setTimeout(() => {
-      setAnimatedText(`+${gold} Gold!\n+${xp} XP!`)
+      setAnimatedText(`+${xp} XP!`) // +${gold} Gold!\n
 
       setUserState(prev => ({
         ...prev,
         gold: prev.gold + gold,
         xp: prev.xp + xp,
       }))
+
+      // the item name
+      addInventoryItem(code)
 
       setTimeout(() => {
         setAnimatedText('')
@@ -134,13 +210,6 @@ const FarmTown = ({
     }))
   }
 
-  const selectInventorySlot = index => {
-    if(index !== selectedInventorySlot)
-      setSelectedInventorySlot(index)
-    else
-      setSelectedInventorySlot(-1)
-  }
-
   return (
     <StyledFarmTown className={classnames({'no-pointer-events': showHelp || showProfile || showCrops || showBuildings})}>
       {showHelp && <HelpDisplay closeHelp={closeHelp} />}
@@ -152,7 +221,12 @@ const FarmTown = ({
         <AnimatedGameText text={animatedText.split('\n')} DURATION={ANIMATED_TEXT_DURATION} />
       )}
 
-      <Farm3d selectedTile={selectedTile} setSelectedTile={setSelectedTile} mockTiles={mockTiles} setMockTiles={setMockTiles} />
+      <Farm3d
+        selectedTile={selectedTile}
+        mockTiles={mockTiles}
+        selectTile={selectTile}
+        setMockTiles={setMockTiles}
+      />
 
       {/* Overlays */}
       <div className="topbar-overlay">
@@ -186,6 +260,8 @@ const FarmTown = ({
             selectedInventorySlot={selectedInventorySlot}
             selectInventorySlot={selectInventorySlot}
             closeInventory={closeInventory}
+            sellSlot={sellInventorySlot}
+            feedTazSlot={feedTazSlot}
           />
         ) : (
           <div className="right-sidebar-toggle">
@@ -198,11 +274,16 @@ const FarmTown = ({
       {selectedTile.id && (
         <BottomBar
           selectedTile={selectedTile}
+          showInventory={showInventory}
           cancelTileAction={cancelTileAction}
           buildPlot={buildPlot}
           clearPlot={clearPlot}
+          cropIndex={cropIndex}
+          setCropIndex={setCropIndex}
         />
       )}
+
+      <Toaster />
     </StyledFarmTown>
   )
 }
@@ -245,7 +326,7 @@ const StyledFarmTown = styled.main`
     right: 0;
     top: ${styleConstants.topbarHeight}px;
     height: calc(100% - ${styleConstants.topbarHeight}px);
-    min-width: 200px;
+    min-width: ${styleConstants.rightSidebarWidth}px;
 
     .right-sidebar-toggle {
       text-align: center;
@@ -257,75 +338,6 @@ const StyledFarmTown = styled.main`
       &.hide-button {
         margin-bottom: 1rem;
         margin-top: 0.5rem;
-      }
-    }
-    
-    .sidebar-layout-container {
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-      background: #281b0d;
-      /* opacity: 0.96; */
-      color: #fff;
-
-      .right-sidebar-header {
-        background: ${brownColors.brown9};
-        margin: 0; padding: 0;
-        width: 100%;
-      }
-
-      .right-sidebar-profile {
-        margin-bottom: 2rem;
-
-        .profile-container {
-          border-radius: 50%;
-          width: 175px;
-          height: 175px;
-          color: #eee;
-          background: #0a0703;
-          line-height: 175px;
-          margin-left: auto;
-          margin-right: auto;
-        }
-      }
-      
-      .right-sidebar-backpack {
-        padding: 4px;
-        flex: 1;
-
-        .right-sidebar-backpack-heading {
-          text-align: center;
-          font-size: 1.9rem;
-          margin-bottom: .85rem;
-          font-family: sans-serif;
-        }
-        .right-sidebar-inventory-container {
-          display: grid;
-          grid-template-columns: 1fr 1fr 1fr 1fr;
-          gap: 10px 5px;
-          padding: 1rem;
-
-          .inventory-item-group {
-            height: 75px;
-            width: 75px;
-            border-radius: 25%;
-            cursor: pointer;
-            background: ${brownColors.brown9};
-            border: 1px solid ${brownColors.brown10};
-            transition: border .05s ease-in-out;
-
-            &:hover, &.selected-slot {
-              border: 1px solid #ddd;
-              transition: border .1s ease-in-out;
-            }
-          }
-        }
-      }
-
-      .right-sidebar-footer {
-        padding: 0.7rem 1rem;
       }
     }
   }
@@ -393,6 +405,17 @@ const StyledFarmTown = styled.main`
         &:hover {
           text-decoration: underline;
         }
+      }
+    }
+  }
+
+  @media(min-width: 1200px) {
+    /* make bottom bar space out for the inventory */
+    .bottom-bar-overlay {
+      right: calc(2rem + 300px + 15px);
+
+      &.bottom-bar-expanded {
+        right: 0 !important;
       }
     }
   }

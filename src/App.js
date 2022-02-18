@@ -3,7 +3,6 @@ import styled from 'styled-components'
 import FarmTown from './components/FarmTown'
 import { Amplify, Auth } from "aws-amplify"
 import { Authenticator, AuthState } from "@aws-amplify/ui-react"
-import "./App.css"
 import "@aws-amplify/ui-react/styles.css"
 
 import awsExports from "./aws-exports"

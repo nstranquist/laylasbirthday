@@ -6,15 +6,18 @@ import { PlotDetails } from './PlotDetails'
 import { crops } from '../../data/cropsWiki'
 import { brownColors } from '../../style/colors'
 
-const cropKeys = Object.keys(crops)
+export const cropKeys = Object.keys(crops).filter(x => x !== 'empty')
 
 export const BottomBar = ({
+  cropIndex,
+  setCropIndex,
   selectedTile,
   cancelTileAction,
+  showInventory,
   buildPlot,
-  clearPlot
+  clearPlot,
+  timeLeft
 }) => {
-  const [cropIndex, setCropIndex] = useState(0)
   const [cropItem, setCropItem] = useState(crops[cropKeys[0]])
 
   useEffect(() => {
@@ -33,25 +36,15 @@ export const BottomBar = ({
     clearPlot()
   }
 
-  const getPlotSvgImage = (tileType) => {
-    console.log('tile type:', tileType)
-    if(!tileType) return <></>
-    if(!crops[tileType]) return <></>
-
-    console.log(crops[tileType])
-    return crops[tileType].SvgImage
-  }
-
-  // , {'bottom-bar-minimized': !showBottomBar}
   return (
-    <StyledBottomBar className={classnames("bottom-bar-overlay")}>
+    <StyledBottomBar className={classnames("bottom-bar-overlay", {'bottom-bar-expanded': !showInventory})}>
       <div className="container">
         {selectedTile?.plotCode !== 0 ? (
           <PlotDetails
             selectedTile={selectedTile}
-            SvgImage={getPlotSvgImage(selectedTile?.tileType)}
             resetPlot={resetPlot}
             cancelTileAction={cancelTileAction}
+            timeLeft={timeLeft}
           />
           ) : (
           <CropSelection
@@ -72,7 +65,7 @@ const StyledBottomBar = styled.div`
     position: absolute;
     bottom: 0;
     left: 0;
-    width: 100%;
+    right: 0;
     border: 1px solid #000;
     min-height: 60px;
     color: #fff;
@@ -87,7 +80,7 @@ const StyledBottomBar = styled.div`
       padding-bottom: 0.5rem;
       margin-top: 0.5rem;
       margin-bottom: 1rem;
-      border: 1px solid #ddd;
+      /* border: 1px solid #ddd; */
     }
     .farm-details-container {
       display: flex;
@@ -116,6 +109,7 @@ const StyledBottomBar = styled.div`
         .farm-detail-top {
           display: flex;
           align-items: center;
+          flex-wrap: wrap;
           margin-bottom: 1rem;
           padding-top: .3rem;
         }
@@ -193,17 +187,18 @@ const StyledBottomBar = styled.div`
 
       .bottom-bar-actions-item {
         height: 100%;
-        border: 1px solid #fff;
+        border: 1px solid #ddd;
         display: inline-block;
         cursor: pointer;
-        padding: 0.7rem 1rem;
+        padding: 0.5rem 1rem;
         font-size: 1.2rem;
         margin: 4px .5rem;
+        margin-bottom: 0;
         border-radius: 8px;
         transition: .05s ease-in-out;
 
         &:hover, &.primary-button {
-          background: #fff;
+          background: #eee;
           color: ${brownColors.brown10};
           transition: .1s ease-in-out;
         }

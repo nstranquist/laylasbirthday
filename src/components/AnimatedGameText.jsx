@@ -18,7 +18,7 @@ export const AnimatedGameText = ({
   })
 
   return (
-    <animated.div style={styles} className="animated-game-text">
+    <animated.div style={styles} className="animated-game-text noselect">
       {text.map((item, index) => (
         <animated.p key={`text-p-${index}`} className="game-text-item">{item}</animated.p>
       ))}

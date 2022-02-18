@@ -77,7 +77,7 @@ export const Farm3d = ({
   mockTiles,
   setMockTiles,
   selectedTile,
-  setSelectedTile
+  selectTile
 }) => {
   const [helperGridPos, setHelperGridPos] = useState([-0.5, 0, -0.5])
   const [dimensions, setDimensions] = useState({ x: 4, y: 4 })
@@ -97,9 +97,9 @@ export const Farm3d = ({
 
   const handleMeshClick = (tile) => {
     if(selectedTile.id === tile.id)
-      setSelectedTile(emptyTile)
+      selectTile(emptyTile)
     else
-      setSelectedTile(tile)
+      selectTile(tile)
   }
 
   const handleMeshEnter = (id) => {
