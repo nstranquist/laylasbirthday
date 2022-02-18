@@ -115,53 +115,53 @@ export const Farm3d = ({
       style={{height:"100%",width:"100%", position: 'absolute'}}
     >
       <Suspense fallback={<Loader />}>
-      {/* <OrthographicCamera makeDefault zoom={50} position={[5, 10, 5, 10]} origin /> */}
+        {/* <OrthographicCamera makeDefault zoom={50} position={[5, 10, 5, 10]} origin /> */}
 
-      <OrbitControls
-        enableZoom
-        enableDamping
-        enablePan
-        enableRotate={canRotate}
-        dampingFactor={0.25}
-        minPolarAngle={0}
-        maxPolarAngle={Math.PI / 2 - 0.2}
-        minDistance={2}
-        maxDistance={25}
-        screenSpacePanning
-        // min/max zoom for orthographic camera only
-        minZoom={15}
-        maxZoom={175}
-      />
-      {/* <MapControls /> */}
+        <OrbitControls
+          enableZoom
+          enableDamping
+          enablePan
+          enableRotate={canRotate}
+          dampingFactor={0.25}
+          minPolarAngle={0}
+          maxPolarAngle={Math.PI / 2 - 0.2}
+          minDistance={2}
+          maxDistance={25}
+          screenSpacePanning
+          // min/max zoom for orthographic camera only
+          minZoom={15}
+          maxZoom={175}
+        />
+        {/* <MapControls /> */}
 
-      <ambientLight intensity={0.75} />
-      <directionalLight position={[5, 5, 5]} intensity={0.75} />
-      <spotLight position={[-15,80,-15]} intensity={0.16} />
+        <ambientLight intensity={0.75} />
+        <directionalLight position={[5, 5, 5]} intensity={0.75} />
+        <spotLight position={[-15,80,-15]} intensity={0.16} />
 
-      {/* <gridHelper args={[dimensions.x, dimensions.y, `white`, `gray`]} position={helperGridPos} /> */}
+        {/* <gridHelper args={[dimensions.x, dimensions.y, `white`, `gray`]} position={helperGridPos} /> */}
 
-      {/* <Sky distance={50} /> */}
+        {/* <Sky distance={50} /> */}
 
-        <Environment
-          background // Whether to affect scene.background
-          // path={'/'}
-          // files={'air_museum_playground_4k.hdr'}
-          preset={'sunset'}
+          <Environment
+            background // Whether to affect scene.background
+            // path={'/'}
+            // files={'air_museum_playground_4k.hdr'}
+            preset={'sunset'}
+          />
+
+        {/* Ground */}
+        <GroundPlane
+          position={[helperGridPos[0],-.05,helperGridPos[2]]}
+          args={[dimensions.x + TILE_PADDING,dimensions.y + TILE_PADDING]}
         />
 
-      {/* Ground */}
-      <GroundPlane
-        position={[helperGridPos[0],-.05,helperGridPos[2]]}
-        args={[dimensions.x + TILE_PADDING,dimensions.y + TILE_PADDING]}
-      />
+        {/* Expand Farm Plane */}
+        {/* <GroundPlane
+          position={[helperGridPos[0],-.12,helperGridPos[2]]}
+          args={[dimensions.x + 2 + TILE_PADDING,dimensions.y + 2 + TILE_PADDING]}
+        /> */}
 
-      {/* Expand Farm Plane */}
-      {/* <GroundPlane
-        position={[helperGridPos[0],-.12,helperGridPos[2]]}
-        args={[dimensions.x + 2 + TILE_PADDING,dimensions.y + 2 + TILE_PADDING]}
-      /> */}
-
-      <group position={[0,0,0]} castShadow receiveShadow>
+        <group position={[0,0,0]} castShadow receiveShadow>
         {/* <Select
           box
           multiple

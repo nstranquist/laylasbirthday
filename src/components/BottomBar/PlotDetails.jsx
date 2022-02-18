@@ -27,6 +27,7 @@ export const PlotDetails = ({
           <div className="farm-details-container" style={{justifyContent:'center'}}>
             <div className="farm-details-center" style={{marginBottom:'0.65rem'}}>
               {/* Harvest Button */}
+              
               <h4 style={{margin:0,marginBottom:'0.2rem'}}>Status:</h4>
               <h2 style={{margin:0}}>Harvested</h2>
             </div>
