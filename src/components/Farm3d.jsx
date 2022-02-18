@@ -84,9 +84,9 @@ export const Farm3d = ({
   const [hoveredId, setHoveredId] = useState('')
   const [canRotate, setCanRotate] = useState(true)
 
-  useEffect(() => {
-    console.log('mock tiles:', mockTiles)
-  }, [mockTiles])
+  // useEffect(() => {
+  //   console.log('mock tiles:', mockTiles)
+  // }, [mockTiles])
 
   useEffect(() => {
     if(selectedTile.id)
@@ -192,9 +192,8 @@ export const Farm3d = ({
             )
           })}
         {/* </Select> */}
-      </group>
+        </group>
       </Suspense>
-
     </Canvas>
   )
 }

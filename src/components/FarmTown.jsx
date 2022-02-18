@@ -11,12 +11,16 @@ import {
   BuildingsDisplay,
 } from './displays'
 import { BottomBar } from './BottomBar/BottomBar'
+import { TopBar as TopBarOverlay } from './TopBar'
 import { RightSidebar } from './RightSidebar'
 import { AnimatedGameText } from './AnimatedGameText'
+import { LeftActionsOverlay } from './LeftActionsOverlay'
 
 import styleConstants from '../utils/style_constants'
 import { brownColors } from '../style/colors'
 import { crops } from '../data/cropsWiki'
+import { nanoid } from '../utils/nanoid'
+import { Timer } from './Timer'
 
 const initialUserState = {
   gold: 0,
@@ -36,6 +40,19 @@ const generateInventory = (slots) => {
 }
 
 const ANIMATED_TEXT_DURATION = 1500
+
+const timersSchema = [
+  {
+    id: nanoid(),
+    tileId: 'abcde', // nanoid()
+    duration: 8, // seconds
+    startTime: 1645166281.3, // seconds since 1970
+    interval: null,
+  },
+  // ...
+]
+
+export const getSeconds = () => new Date().getTime() / 1000;
 
 const FarmTown = ({
   user,
@@ -64,6 +81,10 @@ const FarmTown = ({
   useEffect(() => {
     console.log('welcome to farmtown')
   }, [])
+
+  useEffect(() => {
+    console.log('timers:', timers)
+  }, [timers])
 
   useEffect(() => {
     console.log('animated text:', animatedText)
@@ -145,12 +166,43 @@ const FarmTown = ({
     setSelectedInventorySlot(-1)
   }
 
+  // Timer logic
+  const addTimer = (tileId, duration) => {
+    if(!tileId) return
+    const timerId = nanoid()
+    setTimers(prev => ([
+      ...prev,
+      {
+        id: timerId,
+        tileId: tileId,
+        duration: duration,
+        startTime: getSeconds(),
+        secondsLeft: duration
+      }
+    ]))
+    return timerId
+  }
+
+  const removeTimer = timerId => {
+    setTimers(prev => prev.filter(item => item.id !== timerId))
+  }
+
+  const getTimerSecondsLeft = timerId => {
+    const foundTimer = timers.find(item => item.id === timerId)
+    if(!foundTimer) return 0 // -1
+    const currentSeconds = getSeconds()
+    const remainingSeconds = (foundTimer.startTime + foundTimer.duration) - currentSeconds
+
+    return remainingSeconds > 0 ? remainingSeconds : 0
+  }
+
   const buildPlot = (tileCode, tileType) => {
     if(!selectedTile?.id) return;
     if(selectedTile.plotCode === 1) return;
     if(!crops[tileType]) return
     if(crops[tileType].level > userState.level) return;
 
+    // IDEA: change plane bg to dirt or something, instead of auto assigning it to the model
     setMockTiles(prevTiles => {
       return prevTiles.map(tile => {
         if(tile.id === selectedTile.id) {
@@ -162,19 +214,19 @@ const FarmTown = ({
       })
     })
 
-    const { gold, xp, time, code } = crops[tileType]
+    const { xp, time, code } = crops[tileType]
 
     // setTimer
+    const timerId = addTimer(selectedTile.id, time)
     setTimeout(() => {
-      setAnimatedText(`+${xp} XP!`) // +${gold} Gold!\n
+      removeTimer(timerId)
+      setAnimatedText(`+${xp} XP!`)
 
       setUserState(prev => ({
         ...prev,
-        gold: prev.gold + gold,
         xp: prev.xp + xp,
       }))
 
-      // the item name
       addInventoryItem(code)
 
       setTimeout(() => {
@@ -199,17 +251,6 @@ const FarmTown = ({
     })
   }
 
-  const updateUser = (updates) => {
-    // Check that there are only legal values
-    const foundInvalidUpdate = Object.keys(updates).some(item => !Object.keys(userState).includes(item))
-    if (foundInvalidUpdate) return;
-
-    setUserState(prevState => ({
-      ...prevState,
-      ...updates
-    }))
-  }
-
   return (
     <StyledFarmTown className={classnames({'no-pointer-events': showHelp || showProfile || showCrops || showBuildings})}>
       {showHelp && <HelpDisplay closeHelp={closeHelp} />}
@@ -229,30 +270,15 @@ const FarmTown = ({
       />
 
       {/* Overlays */}
-      <div className="topbar-overlay">
-        <ul className="topbar-stats-list topbar-left">
-          <li className="topbar-stats-item icon-item">
-            <img src={'/ui-icons/coin.png'} height={30} width={30} alt="gold icon" />
-            <span className="item-text">Gold: {userState.gold}</span>
-          </li>
-          <li className="topbar-stats-item icon-item">
-            <img src={'/ui-icons/xp-gold.png'} height={30} width={30} alt="xp icon" />
-            <span className="item-text">XP: {userState.xp}</span>
-          </li>
-        </ul>
-        <ul className="topbar-stats-list topbar-right">
-          <li className="topbar-stats-item topbar-action-item" onClick={() => toggleProfile()}>Welcome, {user?.username || '???'}!</li>
-          <li className="topbar-stats-item topbar-action-item" onClick={() => toggleHelp()}>Help</li>
-          <li className="topbar-stats-item topbar-action-item" onClick={async () => await signOut()}>Log Out</li>
-        </ul>
-      </div>
-      <div className="left-actions-overlay">
-        <ul>
-          <li style={{background:"rgba(255,255,255,0.75)"}} onClick={() => setShowCrops(true)}>Crops</li>
-          <li style={{background:"rgba(255,255,255,0.75)"}} onClick={() => setShowBuildings(true)}>Buildings</li>
-          <li style={{background:"rgba(255,255,255,0.75)"}}>Edit Farm</li>
-        </ul>
-      </div>
+      <TopBarOverlay
+        username={user.username}
+        gold={userState.gold}
+        xp={userState.xp}
+        toggleProfile={toggleProfile}
+        toggleHelp={toggleHelp}
+        signOut={signOut}
+      />
+      <LeftActionsOverlay setShowCrops={setShowCrops} setShowBuildings={setShowBuildings} />
       <div className="right-sidebar-overlay">
         {showInventory ? (
           <RightSidebar
@@ -266,6 +292,9 @@ const FarmTown = ({
         ) : (
           <div className="right-sidebar-toggle">
             <button className="right-sidebar-toggle-button" onClick={toggleInventory}>Show Inventory</button>
+            {timers.map((timer, index) => (
+              <Timer timer={timer} removeTimer={removeTimer} key={`timer-${index}`} />
+            ))}
           </div>
         )}
       </div>
@@ -292,6 +321,23 @@ const StyledFarmTown = styled.main`
   height: 100vh;
   width: 100vw;
   position: relative;
+
+  .temp-timer-item {
+    background: rgba(255,255,255,0.8);
+    padding: 0.2rem 0.3rem;
+    margin-bottom: 0.25rem;
+    
+    h4 {
+      margin: 0;
+      margin-bottom: .3rem;
+      font-size: 1.25rem;
+    }
+    p {
+      margin: 0;
+      margin-bottom: 0.15rem;
+      font-size: 1.1rem;
+    }
+  }
 
   .animated-game-text {
     position: absolute;
@@ -417,6 +463,11 @@ const StyledFarmTown = styled.main`
       &.bottom-bar-expanded {
         right: 0 !important;
       }
+    }
+  }
+  @media(max-width: 700px) {
+    .left-actions-overlay {
+      display: none;
     }
   }
 `

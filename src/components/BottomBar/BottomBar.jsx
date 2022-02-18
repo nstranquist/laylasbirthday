@@ -70,10 +70,7 @@ const StyledBottomBar = styled.div`
     min-height: 60px;
     color: #fff;
     background: ${brownColors.brown4};
-
-    &.bottom-bar-minimized {
-      
-    }
+    opacity: 0.9;
 
     .bottom-bar-body {
       padding-top: 0.5rem;
