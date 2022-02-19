@@ -152,8 +152,12 @@ const FarmTown = ({
             gold: userProfile.gold,
             // username: userProfile.username || prev,
           }))
-          setMockTiles(userProfile.tiles)
-          setInventory(userProfile.inventory)
+          setMockTiles(() => {
+            return userProfile.tiles.map(tile => ({
+              ...tile
+            }))
+          })
+          setInventory([...userProfile.inventory])
           console.log('done setting shit')
         }
       } catch (error) {

@@ -27,8 +27,11 @@ export const Timer = ({
 
   useEffect(() => {
     if(timeLeft <= 0) {
+      stopTimer()
       removeTimer(timer.id)
     }
+
+    return () => stopTimer()
   }, [timeLeft])
 
   const stopTimer = () => timerInterval && clearInterval(timerInterval)
