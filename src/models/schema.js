@@ -24,6 +24,24 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
+                "inventory": {
+                    "name": "inventory",
+                    "isArray": true,
+                    "type": "Int",
+                    "isRequired": false,
+                    "attributes": [],
+                    "isArrayNullable": true
+                },
+                "tiles": {
+                    "name": "tiles",
+                    "isArray": true,
+                    "type": {
+                        "nonModel": "Tile"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "isArrayNullable": true
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -78,6 +96,54 @@ export const schema = {
         }
     },
     "enums": {},
-    "nonModels": {},
-    "version": "551edb5d08513f630c99be957c896802"
+    "nonModels": {
+        "Tile": {
+            "name": "Tile",
+            "fields": {
+                "id": {
+                    "name": "id",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "plotCode": {
+                    "name": "plotCode",
+                    "isArray": false,
+                    "type": "Int",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "plotType": {
+                    "name": "plotType",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "name": {
+                    "name": "name",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "y": {
+                    "name": "y",
+                    "isArray": false,
+                    "type": "Int",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "x": {
+                    "name": "x",
+                    "isArray": false,
+                    "type": "Int",
+                    "isRequired": false,
+                    "attributes": []
+                }
+            }
+        }
+    },
+    "version": "9f2cc19f0bf5ebc25639c98640783604"
 };

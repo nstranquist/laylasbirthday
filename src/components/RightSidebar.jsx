@@ -4,8 +4,6 @@ import toast from 'react-hot-toast'
 import { crops } from '../data/cropsWiki'
 import { brownColors } from '../style/colors'
 import styleConstants from '../utils/style_constants'
-import { SvgButton } from './SvgButton'
-import { ReactComponent as BackpackSvg } from '../assets/ui-icons/backpack.svg'
 
 export const codesMap = {
   0: 'empty',
@@ -28,7 +26,6 @@ export const RightSidebar = ({
   inventory,
   selectedInventorySlot,
   selectInventorySlot,
-  closeInventory,
   sellSlot,
   feedTazSlot,
   profileUrl,
@@ -91,6 +88,10 @@ export const RightSidebar = ({
               <span>profile</span>
             )}
           </div>
+          {/* Level Container */}
+          <div className="profile-level-container">
+            <h3>Level 1</h3>
+          </div>
         </div>
       </div>
       <div className="right-sidebar-backpack">
@@ -126,7 +127,7 @@ export const RightSidebar = ({
             </>
           ) : (
             <p className="right-sidebar-footer-text">
-              Slot {selectedInventorySlot+1} is empty.
+              Slot is empty.
             </p>
           )
         )}
@@ -155,6 +156,13 @@ const StyledRightSidebar = styled.div`
     width: 100%;
   }
 
+  .profile-level-container {
+    margin: 0;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+  }
+
   .right-sidebar-profile {
     margin-top: 1.5rem;
     margin-bottom: 1.5rem;
@@ -176,9 +184,9 @@ const StyledRightSidebar = styled.div`
 
     .right-sidebar-backpack-heading {
       text-align: center;
-      font-size: 1.9rem;
-      margin-bottom: .75rem;
-      margin-top: 1.2rem;
+      font-size: 1.5rem;
+      margin-bottom: 0;
+      margin-top: 2rem;
       font-family: sans-serif;
     }
     .right-sidebar-inventory-container {

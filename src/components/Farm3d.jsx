@@ -76,8 +76,9 @@ export const MAX_TILES_Y = 15
 export const Farm3d = ({
   mockTiles,
   setMockTiles,
-  selectedTile,
-  selectTile
+  selectedTileId,
+  selectedTilePlotCode,
+  selectTile,
 }) => {
   const [helperGridPos, setHelperGridPos] = useState([-0.5, 0, -0.5])
   const [dimensions, setDimensions] = useState({ x: 4.35, y: 4.35 })
@@ -85,14 +86,14 @@ export const Farm3d = ({
   const [canRotate, setCanRotate] = useState(true)
 
   useEffect(() => {
-    if(selectedTile.id)
+    if(selectedTileId && selectedTilePlotCode === 0)
       setCanRotate(false)
     else
       setCanRotate(true)
-  }, [selectedTile])
+  }, [selectedTileId, selectedTilePlotCode])
 
   const handleMeshClick = (tile) => {
-    if(selectedTile.id === tile.id)
+    if(selectedTileId === tile.id)
       selectTile(emptyTile)
     else
       selectTile(tile)
@@ -167,7 +168,7 @@ export const Farm3d = ({
           multiple
           onChange={handleSelectChange}> */}
           {mockTiles.map(tile => {
-            const tileColor = hoveredId === tile.id ? GRASS_COLOR_HIGHLIGHTED : selectedTile.id === tile.id ? GRASS_COLOR_SELECTED : GRASS_COLOR
+            const tileColor = hoveredId === tile.id ? GRASS_COLOR_HIGHLIGHTED : selectedTileId === tile.id ? GRASS_COLOR_SELECTED : GRASS_COLOR
             return (
               <group position={[tile.x,0,tile.y]} key={`${tile.id}`} castShadow receiveShadow>
                 {tile.plotCode !== 0 && <CropTile code={tile.plotCode} />}

@@ -1,57 +1,61 @@
 {
-  "name": "laylas-birthday",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@aws-amplify/ui-react": "2.2.2",
-    "@react-spring/three": "^9.4.3",
-    "@react-spring/web": "^9.4.3",
-    "@react-three/drei": "^8.9.0",
-    "@react-three/fiber": "^7.0.26",
-    "@testing-library/jest-dom": "^5.16.2",
-    "@testing-library/react": "^12.1.2",
-    "@testing-library/user-event": "^13.5.0",
-    "aws-amplify": "4.3.14",
-    "classnames": "^2.3.1",
-    "nanoid": "^3.2.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-hot-toast": "^2.2.0",
-    "react-scripts": "5.0.0",
-    "styled-components": "^5.3.3",
-    "three": "^0.137.5",
-    "web-vitals": "^2.1.4",
-    "zustand": "^3.6.9"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "format": "prettier --write .",
-    "prepare": "husky install"
-  },
-  "devDependencies": {
-    "git-format-staged": "^2.1.3",
-    "husky": "^7.0.0",
-    "prettier": "^2.5.1"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+    "name": "laylas-birthday",
+    "version": "0.1.0",
+    "private": true,
+    "dependencies": {
+        "@aws-amplify/ui-react": "2.2.2",
+        "@react-spring/three": "^9.4.3",
+        "@react-spring/web": "^9.4.3",
+        "@react-three/drei": "^8.9.0",
+        "@react-three/fiber": "^7.0.26",
+        "@testing-library/jest-dom": "^5.16.2",
+        "@testing-library/react": "^12.1.2",
+        "@testing-library/user-event": "^13.5.0",
+        "aws-amplify": "4.3.14",
+        "classnames": "^2.3.1",
+        "nanoid": "^3.2.0",
+        "react": "^17.0.2",
+        "react-dom": "^17.0.2",
+        "react-hot-toast": "^2.2.0",
+        "react-scripts": "5.0.0",
+        "styled-components": "^5.3.3",
+        "three": "^0.137.5",
+        "web-vitals": "^2.1.4",
+        "zustand": "^3.6.9"
+    },
+    "scripts": {
+        "start": "react-scripts start",
+        "build": "react-scripts build",
+        "test": "react-scripts test",
+        "eject": "react-scripts eject",
+        "format": "prettier --write .",
+        "prepare": "husky install",
+        "amplify-modelgen": "node amplify/scripts/amplify-modelgen.js",
+        "amplify-push": "node amplify/scripts/amplify-push.js"
+    },
+    "devDependencies": {
+        "git-format-staged": "^2.1.3",
+        "husky": "^7.0.0",
+        "prettier": "^2.5.1",
+        "ini": "^1.3.5",
+        "inquirer": "^6.5.1"
+    },
+    "eslintConfig": {
+        "extends": [
+            "react-app",
+            "react-app/jest"
+        ]
+    },
+    "browserslist": {
+        "production": [
+            ">0.2%",
+            "not dead",
+            "not op_mini all"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version"
+        ]
+    }
 }

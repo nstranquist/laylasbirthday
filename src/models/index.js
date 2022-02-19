@@ -4,8 +4,9 @@ import { schema } from './schema';
 
 
 
-const { Player } = initSchema(schema);
+const { Player, Tile } = initSchema(schema);
 
 export {
-  Player
+  Player,
+  Tile
 };

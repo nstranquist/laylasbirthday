@@ -3,7 +3,8 @@ import styled from 'styled-components'
 import classnames from 'classnames'
 import toast from 'react-hot-toast'
 import { useDetectGPU } from '@react-three/drei'
-import { Storage } from 'aws-amplify'
+import { Storage, DataStore } from 'aws-amplify'
+import { Player as PlayerModel } from '../models/index.js'
 import { Farm3d, emptyTile, generateMockTiles } from './Farm3d'
 import {
   HelpDisplay,
@@ -25,6 +26,7 @@ import { Timer } from './Timer'
 import { SvgButton } from './SvgButton'
 import { ReactComponent as BackpackSvg } from '../assets/ui-icons/backpack.svg'
 
+
 const initialUserState = {
   gold: 0,
   xp: 0,
@@ -44,6 +46,12 @@ const generateInventory = (slots) => {
 
 const ANIMATED_TEXT_DURATION = 1500
 
+const PlayerModelSchema = {
+  gold: 0,
+  xp: 0,
+  tiles: generateMockTiles(16, 4, 4),
+  inventory: generateInventory(INVENTORY_SLOTS)
+}
 const timersSchema = [
   {
     id: nanoid(),
@@ -52,7 +60,6 @@ const timersSchema = [
     startTime: 1645166281.3, // seconds since 1970
     interval: null,
   },
-  // ...
 ]
 
 export const getSeconds = () => new Date().getTime() / 1000;
@@ -97,6 +104,31 @@ const FarmTown = ({
       })
     }
   }, [GPUTier])
+
+  // Use DataStore to query user data
+  useEffect(() => {
+    const queryUserData = async () => {
+      try {
+        const queryResult = await DataStore.query(PlayerModel)
+        if(queryResult?.length === 0) {
+          // Init user
+          const saveUserResult = await DataStore.save(
+            new PlayerModel(PlayerModelSchema)
+          )
+          console.log('initialized user:', saveUserResult)
+        }
+        else {
+          console.log('found user profile:', queryResult)
+        }
+      } catch (error) {
+        console.error('error querying user data:', error)
+        toast.error('Failed to retrieve user profile data')
+      }
+    }
+
+    if(user)
+      queryUserData()
+  }, [user])
 
   useEffect(() => {
     // const testGetImages = async () => {
@@ -388,7 +420,8 @@ const FarmTown = ({
       )}
 
       <Farm3d
-        selectedTile={selectedTile}
+        selectedTileId={selectedTile.id}
+        selectedTilePlotCode={selectedTile.plotCode}
         mockTiles={mockTiles}
         selectTile={selectTile}
         setMockTiles={setMockTiles}
