@@ -4,6 +4,8 @@ import toast from 'react-hot-toast'
 import { crops } from '../data/cropsWiki'
 import { brownColors } from '../style/colors'
 import styleConstants from '../utils/style_constants'
+import { SvgButton } from './SvgButton'
+import { ReactComponent as BackpackSvg } from '../assets/ui-icons/backpack.svg'
 
 export const codesMap = {
   0: 'empty',
@@ -78,7 +80,7 @@ export const RightSidebar = ({
   return (
     <StyledRightSidebar className="sidebar-layout-container">
       <div className="right-sidebar-header">
-        <button className="right-sidebar-toggle-button hide-button" onClick={closeInventory}>Hide Inventory</button>
+        {/* <button className="right-sidebar-toggle-button hide-button" onClick={closeInventory}>Hide Inventory</button> */}
         <div className="right-sidebar-profile">
           <div className="profile-container">
             {/* TODO: Insert picture of Layla! */}
@@ -149,7 +151,8 @@ const StyledRightSidebar = styled.div`
   }
 
   .right-sidebar-profile {
-    margin-bottom: 2rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
 
     .profile-container {
       border-radius: 50%;

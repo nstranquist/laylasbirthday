@@ -36,7 +36,7 @@ function App() {
               <header className="login-header">
                 {/* Render the Farm SVG */}
                 <img src={'/farm.svg'} height={100} width={100} alt="farm town logo" />
-                <h1 className="login-header-text">Farm Town</h1>
+                <h1 className="login-header-text">Farm Townnnnn</h1>
               </header>
             )
           },
@@ -61,7 +61,7 @@ const StyledApp = styled.div`
 height: 100%;
 position: relative;
 
-[data-amplify-authenticator=""] {
+[data-amplify-authenticator=""], [data-amplify-container=""] {
   position: static;
 }
 [data-amplify-container=""] {

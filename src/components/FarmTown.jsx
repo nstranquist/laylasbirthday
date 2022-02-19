@@ -300,10 +300,10 @@ const FarmTown = ({
             />
           )}
 
-          <div className="right-sidebar-toggle">
+          <div className={classnames("right-sidebar-toggle", {'docked-sidebar': showInventory})}>
             <SvgButton
               SvgImage={BackpackSvg}
-              onClick={toggleInventory}
+              onClick={() => setShowInventory(prev => !prev)}
               transparent
               buttonStyles={{marginBottom: '1rem', marginTop: '0.5rem'}}
             />
@@ -399,10 +399,14 @@ const StyledFarmTown = styled.main`
     .right-sidebar-toggle {
       position: absolute;
       top: 0;
-      left: -1rem;
+      right: 1rem;
       text-align: center;
       margin: 1rem;
       margin-right: 0;
+
+      &.docked-sidebar {
+        right: calc(3rem + 315px); // 2rem + 300px + 15px + 1rem
+      }
     }
     .right-sidebar-toggle-button {
       cursor: pointer;
