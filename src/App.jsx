@@ -1,7 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
 import styled from 'styled-components'
 import { Amplify } from "aws-amplify"
-import { Authenticator } from "@aws-amplify/ui-react"
+import { Authenticator, PasswordField } from "@aws-amplify/ui-react"
 import { Toaster } from 'react-hot-toast'
 import "@aws-amplify/ui-react/styles.css"
 
@@ -19,7 +19,7 @@ function App() {
 
   return (
     <StyledApp className="App">
-      <Authenticator loginMechanisms={['username']} hideSignUp
+      <Authenticator loginMechanisms={['username']} hideSignUp signUpAttributes={[]}
         components={{
           Header: () => (
             <>
@@ -40,6 +40,15 @@ function App() {
               </header>
             )
           },
+          ForceNewPassword: {
+            FormFields() {
+              return (
+                <>
+                  {/* <Authenticator.ForceNewPassword.FormFields /> */}
+                </>
+              )
+            }
+          }
           // Footer: () => (
           //   <footer className="login-page-footer">
           //     login footer

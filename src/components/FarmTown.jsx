@@ -26,12 +26,24 @@ import { Timer } from './Timer'
 import { SvgButton } from './SvgButton'
 import { ReactComponent as BackpackSvg } from '../assets/ui-icons/backpack.svg'
 
+// levels by amount of xp. level[0] = xp at level 1, which is 0xp
+export const levels = [
+  0,
+  15,
+  25,
+  40,
+  65,
+  105,
+  170,
+  275,
+
+]
 
 const initialUserState = {
   gold: 0,
   xp: 0,
-  timeElapsed: 0,
-  clicks: 0 // lol
+  // timeElapsed: 0,
+  // clicks: 0 // lol
 }
 
 const INVENTORY_SLOTS = 16 // 4x4 // 4x5
@@ -49,6 +61,7 @@ const ANIMATED_TEXT_DURATION = 1500
 const PlayerModelSchema = {
   gold: 0,
   xp: 0,
+  username: '',
   tiles: generateMockTiles(16, 4, 4),
   inventory: generateInventory(INVENTORY_SLOTS)
 }
@@ -109,19 +122,42 @@ const FarmTown = ({
   useEffect(() => {
     const queryUserData = async () => {
       try {
-        const queryResult = await DataStore.query(PlayerModel)
+        const queryResult = await DataStore.query(PlayerModel) // , c => c.username("eq", user.username)
         if(queryResult?.length === 0) {
           // Init user
           const saveUserResult = await DataStore.save(
-            new PlayerModel(PlayerModelSchema)
+            new PlayerModel({
+              ...PlayerModelSchema,
+              // username: user.username
+            })
           )
           console.log('initialized user:', saveUserResult)
+          setUserState(prev => ({
+            ...prev,
+            xp: saveUserResult.xp,
+            gold: saveUserResult.gold,
+            // username: saveUserResult.username || prev
+          }))
+          console.log('set the user state')
+          setMockTiles(saveUserResult.tiles)
+          setInventory(saveUserResult.inventory)
         }
         else {
           console.log('found user profile:', queryResult)
+          const userProfile = queryResult[0]
+          console.log('user profile:', userProfile, 'type:', typeof userProfile)
+          setUserState(prev => ({
+            ...prev,
+            xp: userProfile.xp,
+            gold: userProfile.gold,
+            // username: userProfile.username || prev,
+          }))
+          setMockTiles(userProfile.tiles)
+          setInventory(userProfile.inventory)
+          console.log('done setting shit')
         }
       } catch (error) {
-        console.error('error querying user data:', error)
+        console.error('error querying user data:', JSON.stringify(error))
         toast.error('Failed to retrieve user profile data')
       }
     }
