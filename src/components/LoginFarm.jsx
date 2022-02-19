@@ -4,8 +4,8 @@ import { Canvas } from "@react-three/fiber"
 import LoginFarmModel from './models/LoginFarmModel'
 import { Loader } from "./LoaderUI"
 
-const getMaxDistance = (a) => {
-  const distanceSq = Math.pow(a, 2)
+const getMaxDistance = (a, padding=20) => {
+  const distanceSq = Math.pow(a + padding, 2)
   return Math.sqrt((distanceSq + distanceSq), 2)
 }
 const maxDistance= getMaxDistance(100)
