@@ -8,7 +8,9 @@ export const TopBar = ({
   toggleHelp,
   signOut,
 }) => {
-
+  const uploadFile = (e) => {
+    console.log(e.target.files)
+  }
   return (
     <div className="topbar-overlay">
       <ul className="topbar-stats-list topbar-left">

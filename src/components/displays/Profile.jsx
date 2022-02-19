@@ -2,6 +2,7 @@ import styled from 'styled-components'
 import { brownColors } from '../../style/colors'
 
 export const ProfileDisplay = ({
+  userImages,
   closeProfile,
   // user,
   // userState
@@ -17,6 +18,11 @@ export const ProfileDisplay = ({
         <p className="profile-body-text">
           Adventurer
         </p>
+        <div className="pictures-container">
+          {userImages.map((image, index) => (
+            <img key={`picture-${image.key}`} src={image.file} style={{maxHeight: 300, width:'auto'}} alt={`user-${image.key}`} />
+          ))}
+        </div>
       </div>
     </StyledProfileDisplay>
   )

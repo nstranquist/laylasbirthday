@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import classnames from 'classnames'
 import toast from 'react-hot-toast'
+import { useDetectGPU } from '@react-three/drei'
+import { Storage } from 'aws-amplify'
 import { Farm3d, emptyTile, generateMockTiles } from './Farm3d'
 import {
   HelpDisplay,
@@ -22,7 +24,6 @@ import { nanoid } from '../utils/nanoid'
 import { Timer } from './Timer'
 import { SvgButton } from './SvgButton'
 import { ReactComponent as BackpackSvg } from '../assets/ui-icons/backpack.svg'
-import { useDetectGPU } from '@react-three/drei'
 
 const initialUserState = {
   gold: 0,
@@ -72,6 +73,8 @@ const FarmTown = ({
   const [showBuildings, setShowBuildings] = useState(false)
   const [showCrops, setShowCrops] = useState(false)
   const [selectedInventorySlot, setSelectedInventorySlot] = useState(-1)
+  const [profileUrl, setProfileUrl] = useState('')
+  const [userImages, setUserImages] = useState([]) // { key: '', file: '' }
 
   const [timers, setTimers] = useState([])
 
@@ -86,6 +89,7 @@ const FarmTown = ({
     console.log('welcome to farmtown')
 
     if(GPUTier.tier === "0" || GPUTier.isMobile) {
+      console.log('gpu is low')
       // show toast to alert the user
       toast('', {
         icon: '⚠️',
@@ -93,6 +97,98 @@ const FarmTown = ({
       })
     }
   }, [GPUTier])
+
+  useEffect(() => {
+    // const testGetImages = async () => {
+    //   try {
+    //     const all = await Storage.list('')
+    //     console.log('list all:', all)
+    //     const listPrivate = await Storage.list('', { level: 'private'})
+    //     console.log('private images:', listPrivate)
+    //     const listProtected = await Storage.list('', { level: 'protected'})
+    //     console.log('protected images:', listProtected)
+    //     // const imageResult = await Storage.get('profile.jpg', {
+    //     //   level: 'private'
+    //     // })
+    //     // console.log('image result:', imageResult)
+    //     // if(imageResult)
+    //     //   setProfileUrl(imageResult)
+    //   } catch (err) {
+    //     console.error('storage get error:', err.message)
+    //     toast.error('Could not get your profile picture!')
+    //   }
+    // }
+
+    const getUserImages = async () => {
+      try {
+        // List user files
+        const images = await Storage.list('', { level: 'private' })
+        if(!images || images.length === 0) {
+          toast.error('No files exist for this user yet!')
+        }
+        console.log('found images:', images)
+        // for each file with key found, retrieve the image
+        await new Promise((resolve, reject) => {
+          images.filter(image => image.key).forEach(async (image, index) => {
+            const { key } = image;
+
+            const isFolder = key.slice(-1) === '/' ? true : false
+
+            if(isFolder) {
+              console.log('found a folder with key:', key)
+              return;
+            }
+            
+            // Get that image by key
+            try {
+              const imageResult = await Storage.get(key, { level: 'private' }) // image result is the SIGNED url!
+              if(!imageResult) throw new Error('Could not find that image!')
+              console.log('image result:', imageResult)
+              // TODO assign the profile's s3 key in the user's dynamodb model
+              if(key === 'profile' || key.split('.')[0] === 'profile') {
+                // set the image to state
+                setProfileUrl(imageResult)
+              }
+              else {
+                setUserImages(prev => ([
+                  ...prev,
+                  {key, file: imageResult}
+                ]))
+              }
+            } catch (error) {
+              console.error('error in individual file retrieval:', error)
+              toast.error(`There was an error getting your file: ${key}`)
+            }
+          })
+        })
+
+        // parse out the profile pic, and set that
+      } catch (error) {
+        console.error('error getting file:', error)
+        toast.error('Could not get your user images!')
+      }
+    }
+
+    // const uploadTestFile = async (filename) => {
+    //   try {
+    //     const result = await Storage.put(filename, filename, {
+    //       level: 'private'
+    //     })
+    //     console.log('result:', result)
+    //   } catch (error) {
+    //     console.error('error in test upload:', error)
+    //   }
+    // }
+
+    if(user?.username) {
+      console.log('username:', user.username)
+      // testGetImages()
+      setUserImages([])
+      getUserImages()
+
+      // uploadTestFile('text.txt')
+    }
+  }, [user])
 
   useEffect(() => {
     if(animatedText) {
@@ -269,10 +365,21 @@ const FarmTown = ({
     return foundTimer
   }
 
+  // const uploadFile = async e => {
+  //   const file = e.target.files[0]
+  //   if(!file) return;
+  //   try {
+  //     await Storage.put(file.name, file)
+  //   } catch (error) {
+  //     console.error('error uploading file:', error)
+  //   }
+  // }
+
   return (
     <StyledFarmTown className={classnames({'no-pointer-events': showHelp || showProfile || showCrops || showBuildings})}>
+      
       {showHelp && <HelpDisplay closeHelp={closeHelp} />}
-      {showProfile && <ProfileDisplay closeProfile={closeProfile} />}
+      {showProfile && <ProfileDisplay userImages={userImages} closeProfile={closeProfile} />}
       {showCrops && <CropsDisplay closeDisplay={() => setShowCrops(false)} />}
       {showBuildings && <BuildingsDisplay closeDisplay={() => setShowBuildings(false)} />}
 
@@ -307,6 +414,7 @@ const FarmTown = ({
               closeInventory={closeInventory}
               sellSlot={sellInventorySlot}
               feedTazSlot={feedTazSlot}
+              profileUrl={profileUrl}
             />
           )}
 
@@ -320,6 +428,7 @@ const FarmTown = ({
             {timers.map((timer, index) => (
               <Timer timer={timer} removeTimer={removeTimer} key={`timer-${index}`} showDebug={false} />
             ))}
+            
           </div>
         </div>
       </div>

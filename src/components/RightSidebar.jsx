@@ -30,7 +30,8 @@ export const RightSidebar = ({
   selectInventorySlot,
   closeInventory,
   sellSlot,
-  feedTazSlot
+  feedTazSlot,
+  profileUrl,
 }) => {
 
   const getCropImage = code => {
@@ -84,7 +85,11 @@ export const RightSidebar = ({
         <div className="right-sidebar-profile">
           <div className="profile-container">
             {/* TODO: Insert picture of Layla! */}
-            profile
+            {profileUrl ? (
+              <img src={profileUrl} alt="profile-pic" height={175} width={175} style={{borderRadius:'50%'}} />
+            ) : (
+              <span>profile</span>
+            )}
           </div>
         </div>
       </div>
