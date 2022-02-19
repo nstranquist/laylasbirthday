@@ -120,7 +120,7 @@ export const Farm3d = ({
         <OrbitControls
           enableZoom
           enableDamping
-          enablePan
+          enablePan={false}
           enableRotate={canRotate}
           dampingFactor={0.25}
           minPolarAngle={0}

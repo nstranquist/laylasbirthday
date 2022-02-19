@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import classnames from 'classnames'
-import toast, { Toaster } from 'react-hot-toast'
-
+import toast from 'react-hot-toast'
 import { Farm3d, emptyTile, generateMockTiles } from './Farm3d'
 import {
   HelpDisplay,
@@ -23,6 +22,7 @@ import { nanoid } from '../utils/nanoid'
 import { Timer } from './Timer'
 import { SvgButton } from './SvgButton'
 import { ReactComponent as BackpackSvg } from '../assets/ui-icons/backpack.svg'
+import { useDetectGPU } from '@react-three/drei'
 
 const initialUserState = {
   gold: 0,
@@ -60,6 +60,8 @@ const FarmTown = ({
   user,
   signOut
 }) => {
+  const GPUTier = useDetectGPU()
+
   const [mockTiles, setMockTiles] = useState(generateMockTiles(16, 4, 4))
 
   const [userState, setUserState] = useState(initialUserState)
@@ -82,7 +84,15 @@ const FarmTown = ({
 
   useEffect(() => {
     console.log('welcome to farmtown')
-  }, [])
+
+    if(GPUTier.tier === "0" || GPUTier.isMobile) {
+      // show toast to alert the user
+      toast('', {
+        icon: '⚠️',
+        duration: 6000
+      })
+    }
+  }, [GPUTier])
 
   useEffect(() => {
     if(animatedText) {
@@ -329,8 +339,6 @@ const FarmTown = ({
           timer={getActiveTimer(selectedTile.id)}
         />
       )}
-
-      <Toaster />
     </StyledFarmTown>
   )
 }

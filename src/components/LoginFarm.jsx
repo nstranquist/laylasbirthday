@@ -4,18 +4,21 @@ import { Canvas } from "@react-three/fiber"
 import LoginFarmModel from './models/LoginFarmModel'
 import { Loader } from "./LoaderUI"
 
-const getMaxDistance = (a, padding=20) => {
+const DISTANCE = 100
+const PADDING = 100
+
+const getMaxDistance = (a, padding=PADDING) => {
   const distanceSq = Math.pow(a + padding, 2)
   return Math.sqrt((distanceSq + distanceSq), 2)
 }
-const maxDistance= getMaxDistance(100)
+const maxDistance= getMaxDistance(DISTANCE)
 
 const LoginFarm = () => {
 
   return (
     <Canvas
       pixelRatio={window.devicePixelRatio}
-      camera={{ position: [100,100,100]}}
+      camera={{ position: [DISTANCE,DISTANCE,DISTANCE]}}
       style={{height: '100%', width: '100%'}} // position: 'absolute'
     >
       <Suspense fallback={<Loader />}>
@@ -25,6 +28,7 @@ const LoginFarm = () => {
 
         <OrbitControls
           autoRotate
+          enablePan={false}
           rotateSpeed={0.75}
           enableRotate={false}
           enableZoom

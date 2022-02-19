@@ -2,7 +2,7 @@ import { useState, useEffect, lazy, Suspense } from 'react'
 import styled from 'styled-components'
 import { Amplify } from "aws-amplify"
 import { Authenticator } from "@aws-amplify/ui-react"
-// import { Loader } from './components/LoaderUI'
+import { Toaster } from 'react-hot-toast'
 import "@aws-amplify/ui-react/styles.css"
 
 import awsExports from "./aws-exports"
@@ -36,7 +36,7 @@ function App() {
               <header className="login-header">
                 {/* Render the Farm SVG */}
                 <img src={'/farm.svg'} height={100} width={100} alt="farm town logo" />
-                <h1 className="login-header-text">Farm Townnnnn</h1>
+                <h1 className="login-header-text">Farm Town</h1>
               </header>
             )
           },
@@ -49,6 +49,7 @@ function App() {
       >
         {({ signOut, user }) => (
           <div style={{background: "#fff", height: '100vh', width: '100vw', zIndex: 1}}>
+            <Toaster />
             <Suspense fallback={<></>}>
               <LazyFarmTown signOut={signOut} user={user} />
             </Suspense>
@@ -72,6 +73,9 @@ position: relative;
   * {
     z-index: 4; 
   }
+}
+[data-amplify-router=""] {
+  background: rgba(255,255,255,0.94);
 }
 .login-farm-container {
   position: absolute;
