@@ -3,6 +3,7 @@ import classnames from 'classnames'
 import toast from 'react-hot-toast'
 import { crops } from '../data/cropsWiki'
 import { brownColors } from '../style/colors'
+import styleConstants from '../utils/style_constants'
 
 export const codesMap = {
   0: 'empty',
@@ -138,6 +139,7 @@ const StyledRightSidebar = styled.div`
   /* opacity: 0.96; */
   color: #fff;
   overflow-y: auto;
+  min-width: ${styleConstants.rightSidebarWidth}px;
 
   .right-sidebar-header {
     background: ${brownColors.brown9};

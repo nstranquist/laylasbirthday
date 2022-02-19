@@ -1,45 +1,35 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
 import styled from 'styled-components'
-import FarmTown from './components/FarmTown'
-import { Amplify, Auth } from "aws-amplify"
-import { Authenticator, AuthState } from "@aws-amplify/ui-react"
+import { Amplify } from "aws-amplify"
+import { Authenticator } from "@aws-amplify/ui-react"
+// import { Loader } from './components/LoaderUI'
 import "@aws-amplify/ui-react/styles.css"
 
 import awsExports from "./aws-exports"
-import { Loader } from './components/LoaderUI'
 Amplify.configure(awsExports)
 
-const LoginFarm = lazy(() => import('./components/LoginFarm'))
+const LazyLoginFarm = lazy(() => import('./components/LoginFarm'))
 const LazyFarmTown = lazy(() => import('./components/FarmTown'))
 
 function App() {
   const [authState, setAuthState] = useState('signIn')
-  const [user, setUser] = useState()
-
-  useEffect(() => {
-    if(!user) {
-      setAuthState('signIn')
-    }
-  }, [user])
 
   // Add Custom Header:
   // https://ui.docs.amplify.aws/components/authenticator#customization
 
   return (
     <StyledApp className="App">
-      {authState === 'signIn' && (
-        <div className="login-farm-container">
-          <Suspense fallback={<></>}>
-            <LoginFarm />
-          </Suspense>
-        </div>
-      )}
-      <Authenticator loginMechanisms={['username']} hideSignUp initialState={authState}
+      <Authenticator loginMechanisms={['username']} hideSignUp
         components={{
           Header: () => (
-            <div className="login-page-header">
-              
-            </div>
+            <>
+              <div className="login-page-header"></div>
+              <div className="login-farm-container">
+                <Suspense fallback={<></>}>
+                  <LazyLoginFarm />
+                </Suspense>
+              </div>
+            </>
           ),
           SignIn: {
             Header: () => (
@@ -69,11 +59,25 @@ function App() {
 
 const StyledApp = styled.div`
 height: 100%;
+position: relative;
 
+[data-amplify-authenticator=""] {
+  position: static;
+}
+[data-amplify-container=""] {
+  z-index: 2;
+
+  * {
+    z-index: 4; 
+  }
+}
 .login-farm-container {
+  left: 0;
+  top: 0;
   height: 100vh;
   width: 100vw;
   position: absolute;
+  z-index: -1;
 }
 .amplify-tabs {
   display: none;
@@ -101,7 +105,6 @@ height: 100%;
 }
 .login-page-footer {
   margin-top: auto;
-
 }
 `
 

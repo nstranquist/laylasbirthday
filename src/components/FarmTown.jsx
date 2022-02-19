@@ -21,6 +21,8 @@ import { brownColors } from '../style/colors'
 import { crops } from '../data/cropsWiki'
 import { nanoid } from '../utils/nanoid'
 import { Timer } from './Timer'
+import { SvgButton } from './SvgButton'
+import { ReactComponent as BackpackSvg } from '../assets/ui-icons/backpack.svg'
 
 const initialUserState = {
   gold: 0,
@@ -64,7 +66,7 @@ const FarmTown = ({
   const [selectedTile, setSelectedTile] = useState(emptyTile)
   const [showHelp, setShowHelp] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
-  const [showInventory, setShowInventory] = useState(false)
+  const [showInventory, setShowInventory] = useState(true)
   const [showBuildings, setShowBuildings] = useState(false)
   const [showCrops, setShowCrops] = useState(false)
   const [selectedInventorySlot, setSelectedInventorySlot] = useState(-1)
@@ -181,14 +183,14 @@ const FarmTown = ({
     setTimers(prev => prev.filter(item => item.id !== timerId))
   }
 
-  const getTimerSecondsLeft = timerId => {
-    const foundTimer = timers.find(item => item.id === timerId)
-    if(!foundTimer) return 0 // -1
-    const currentSeconds = getSeconds()
-    const remainingSeconds = (foundTimer.startTime + foundTimer.duration) - currentSeconds
+  // const getTimerSecondsLeft = timerId => {
+  //   const foundTimer = timers.find(item => item.id === timerId)
+  //   if(!foundTimer) return 0 // -1
+  //   const currentSeconds = getSeconds()
+  //   const remainingSeconds = (foundTimer.startTime + foundTimer.duration) - currentSeconds
 
-    return remainingSeconds > 0 ? remainingSeconds : 0
-  }
+  //   return remainingSeconds > 0 ? remainingSeconds : 0
+  // }
 
   const buildPlot = (tileCode, tileType) => {
     if(!selectedTile?.id) return;
@@ -286,23 +288,30 @@ const FarmTown = ({
       />
       <LeftActionsOverlay setShowCrops={setShowCrops} setShowBuildings={setShowBuildings} />
       <div className="right-sidebar-overlay">
-        {showInventory ? (
-          <RightSidebar
-            inventory={inventory}
-            selectedInventorySlot={selectedInventorySlot}
-            selectInventorySlot={selectInventorySlot}
-            closeInventory={closeInventory}
-            sellSlot={sellInventorySlot}
-            feedTazSlot={feedTazSlot}
-          />
-        ) : (
+        <div className="inner-right-sidebar">
+          {showInventory && (
+            <RightSidebar
+              inventory={inventory}
+              selectedInventorySlot={selectedInventorySlot}
+              selectInventorySlot={selectInventorySlot}
+              closeInventory={closeInventory}
+              sellSlot={sellInventorySlot}
+              feedTazSlot={feedTazSlot}
+            />
+          )}
+
           <div className="right-sidebar-toggle">
-            <button className="right-sidebar-toggle-button" onClick={toggleInventory}>Show Inventory</button>
+            <SvgButton
+              SvgImage={BackpackSvg}
+              onClick={toggleInventory}
+              transparent
+              buttonStyles={{marginBottom: '1rem', marginTop: '0.5rem'}}
+            />
             {timers.map((timer, index) => (
               <Timer timer={timer} removeTimer={removeTimer} key={`timer-${index}`} showDebug={false} />
             ))}
           </div>
-        )}
+        </div>
       </div>
 
       {/* Display Info about the plot selected */}
@@ -381,11 +390,19 @@ const StyledFarmTown = styled.main`
     right: 0;
     top: ${styleConstants.topbarHeight}px;
     height: calc(100% - ${styleConstants.topbarHeight}px);
-    min-width: ${styleConstants.rightSidebarWidth}px;
+
+    .inner-right-sidebar {
+      height: 100%;
+      position: relative;
+    }
 
     .right-sidebar-toggle {
+      position: absolute;
+      top: 0;
+      left: -1rem;
       text-align: center;
       margin: 1rem;
+      margin-right: 0;
     }
     .right-sidebar-toggle-button {
       cursor: pointer;
