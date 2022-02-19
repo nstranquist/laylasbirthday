@@ -58,9 +58,11 @@ function App() {
         }}
       >
         {({ signOut, user }) => (
-          <Suspense fallback={<></>}>
-            <LazyFarmTown signOut={signOut} user={user} />
-          </Suspense>
+          <div style={{background: "#fff", height: '100vh', width: '100vw', zIndex: 1}}>
+            <Suspense fallback={<></>}>
+              <LazyFarmTown signOut={signOut} user={user} />
+            </Suspense>
+          </div>
         )}
       </Authenticator>
     </StyledApp>
@@ -71,9 +73,12 @@ const StyledApp = styled.div`
 height: 100%;
 
 .login-farm-container {
+  position: absolute;
+  top: 0;
+  left: 0;
   height: 100vh;
   width: 100vw;
-  position: absolute;
+  z-index: -1;
 }
 .amplify-tabs {
   display: none;
