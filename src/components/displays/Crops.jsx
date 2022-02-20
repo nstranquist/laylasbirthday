@@ -13,13 +13,18 @@ export const CropsDisplay = ({
       </div>
       <div className="container">
         <h1>Crops</h1>
-        {crops.map(crop => (
-          <div className="crop-display-item">
-            <h3 className="crop-title">{crop.name}</h3>
-            <p className="display-body-text">
-              {crop.desc}
-            </p>
-            <p style={{margin:0,marginBottom:'.35rem'}}>LOL, did not get this far</p>
+        {Object.entries(crops).filter(([key,_]) => key !== 'empty').map(([key, crop]) => (
+          <div className="crop-display-item" key={crop.id}>
+            <div className="crop-display-item-left">
+              <crop.SvgImage height={200} width={200} />
+            </div>
+            <div className="crop-display-item-right">
+              <h3 className="crop-title">{crop.name}</h3>
+              <p className="display-body-text">
+                {crop.desc}
+              </p>
+              <p style={{margin:0,marginBottom:'.35rem'}}>LOL, did not get this far</p>
+            </div>
           </div>
         ))}
       </div>
@@ -38,6 +43,8 @@ const StyledCropsDisplay = styled.div`
   border-radius: 1px;
   z-index: 1001;
   pointer-events: all !important;
+  overflow-y: auto;
+  padding-bottom: 2rem;
 
   .close-display {
     position: fixed;
@@ -55,8 +62,15 @@ const StyledCropsDisplay = styled.div`
     margin-bottom: 0.5rem;
     padding: 1rem;
     background: #fff;
-    border-radius: 5%;
+    border-radius: 15px;
     border: 1px solid rgba(33,33,33,.3);
+    display: flex;
+
+    .crop-display-item-right {
+      flex: 1;
+      text-align: left;
+      padding-left: 2rem;
+    }
 
     h3 {
       margin: 0;
