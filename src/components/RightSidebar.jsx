@@ -1,6 +1,7 @@
 import styled from 'styled-components'
 import classnames from 'classnames'
 import toast from 'react-hot-toast'
+import { levels } from './FarmTown'
 import { crops } from '../data/cropsWiki'
 import { brownColors } from '../style/colors'
 import styleConstants from '../utils/style_constants'
@@ -25,10 +26,11 @@ export const inventoryOptions = [
 export const RightSidebar = ({
   inventory,
   selectedInventorySlot,
+  profileUrl,
+  xp,
   selectInventorySlot,
   sellSlot,
   feedTazSlot,
-  profileUrl,
 }) => {
 
   const getCropImage = code => {
@@ -75,6 +77,36 @@ export const RightSidebar = ({
     sellSlot(slotIndex, getSlotSellPrice(slotIndex))
   }
 
+  // returns react component with the current level, the xp remaining til the next level
+  const getLevelText = (xp) => {
+    let currentLevel;
+    if(xp < 0)
+      currentLevel = 0
+    else {
+      const levelIndex = levels.findIndex(level => level >= xp)
+      if (levelIndex === -1)
+        currentLevel = 14
+      else
+        currentLevel = levelIndex
+    }
+
+    let nextLevelXp;
+    if(currentLevel === 14)
+      nextLevelXp = 'MAXED'
+    else
+      nextLevelXp = levels[currentLevel] - xp
+
+    return (
+      <div className="profile-level-container">
+        <h3 className="next-level-text">Level {currentLevel}</h3>
+        <p className="next-level-xp">
+          <img src={'/ui-icons/xp-gold.png'} height={18} width={18} alt="xp icon" style={{marginRight:4}} />
+          {nextLevelXp}xp til next level
+        </p>
+      </div>
+    )
+  }
+
   return (
     <StyledRightSidebar className="sidebar-layout-container">
       <div className="right-sidebar-header">
@@ -89,9 +121,7 @@ export const RightSidebar = ({
             )}
           </div>
           {/* Level Container */}
-          <div className="profile-level-container">
-            <h3>Level 1</h3>
-          </div>
+          {getLevelText(xp)}
         </div>
       </div>
       <div className="right-sidebar-backpack">
@@ -158,9 +188,18 @@ const StyledRightSidebar = styled.div`
 
   .profile-level-container {
     margin: 0;
-    margin-top: 1rem;
+    margin-top: 1.2rem;
     margin-bottom: 1rem;
     font-size: 1.5rem;
+
+    .next-level-text {
+      margin: 0;
+      margin-bottom: 0.75rem;
+    }
+    .next-level-xp {
+      font-size: 1.15rem;
+      margin: 0;
+    }
   }
 
   .right-sidebar-profile {

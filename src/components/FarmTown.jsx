@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import classnames from 'classnames'
 import toast from 'react-hot-toast'
 import { useDetectGPU } from '@react-three/drei'
-import { Storage, DataStore } from 'aws-amplify'
+import { Storage, DataStore, /*API*/ } from 'aws-amplify'
 import { Player as PlayerModel } from '../models/index.js'
 import { Farm3d, emptyTile, generateMockTiles } from './Farm3d'
 import {
@@ -28,7 +28,6 @@ import { ReactComponent as BackpackSvg } from '../assets/ui-icons/backpack.svg'
 
 // levels by amount of xp. level[0] = xp at level 1, which is 0xp
 export const levels = [
-  0,
   15,
   25,
   40,
@@ -36,8 +35,15 @@ export const levels = [
   105,
   170,
   275,
-
+  445,
+  720,
+  1165,
+  1885,
+  3050,
+  4935, // level 14
 ]
+// Level 1
+// 45 xp needed til level 2
 
 const initialUserState = {
   gold: 0,
@@ -83,7 +89,7 @@ const FarmTown = ({
 }) => {
   const GPUTier = useDetectGPU()
 
-  const [mockTiles, setMockTiles] = useState(generateMockTiles(16, 4, 4))
+  const [tiles, setTiles] = useState(generateMockTiles(16, 4, 4))
 
   const [userState, setUserState] = useState(initialUserState)
   const [selectedTile, setSelectedTile] = useState(emptyTile)
@@ -128,37 +134,29 @@ const FarmTown = ({
           const saveUserResult = await DataStore.save(
             new PlayerModel({
               ...PlayerModelSchema,
-              // username: user.username
             })
           )
-          console.log('initialized user:', saveUserResult)
           setUserState(prev => ({
             ...prev,
             xp: saveUserResult.xp,
             gold: saveUserResult.gold,
-            // username: saveUserResult.username || prev
           }))
-          console.log('set the user state')
-          setMockTiles(saveUserResult.tiles)
+          setTiles(saveUserResult.tiles)
           setInventory(saveUserResult.inventory)
         }
         else {
-          console.log('found user profile:', queryResult)
           const userProfile = queryResult[0]
-          console.log('user profile:', userProfile, 'type:', typeof userProfile)
           setUserState(prev => ({
             ...prev,
             xp: userProfile.xp,
             gold: userProfile.gold,
-            // username: userProfile.username || prev,
           }))
-          setMockTiles(() => {
+          setTiles(() => {
             return userProfile.tiles.map(tile => ({
               ...tile
             }))
           })
           setInventory([...userProfile.inventory])
-          console.log('done setting shit')
         }
       } catch (error) {
         console.error('error querying user data:', JSON.stringify(error))
@@ -171,26 +169,6 @@ const FarmTown = ({
   }, [user])
 
   useEffect(() => {
-    // const testGetImages = async () => {
-    //   try {
-    //     const all = await Storage.list('')
-    //     console.log('list all:', all)
-    //     const listPrivate = await Storage.list('', { level: 'private'})
-    //     console.log('private images:', listPrivate)
-    //     const listProtected = await Storage.list('', { level: 'protected'})
-    //     console.log('protected images:', listProtected)
-    //     // const imageResult = await Storage.get('profile.jpg', {
-    //     //   level: 'private'
-    //     // })
-    //     // console.log('image result:', imageResult)
-    //     // if(imageResult)
-    //     //   setProfileUrl(imageResult)
-    //   } catch (err) {
-    //     console.error('storage get error:', err.message)
-    //     toast.error('Could not get your profile picture!')
-    //   }
-    // }
-
     const getUserImages = async () => {
       try {
         // List user files
@@ -253,8 +231,6 @@ const FarmTown = ({
     // }
 
     if(user?.username) {
-      console.log('username:', user.username)
-      // testGetImages()
       setUserImages([])
       getUserImages()
 
@@ -273,6 +249,61 @@ const FarmTown = ({
       }, ANIMATED_TEXT_DURATION)
     }
   }, [animatedText])
+
+  const cloneDeep = object => JSON.parse(JSON.stringify(object))
+
+  // User API update
+  const saveUserState = async (modifiedState, modifiedKeys=[]) => { // ['userState', 'inventory', 'tiles']
+    // optimistically set the user's state, and
+    // make a backup of user state, in case we need to revert back on error
+    let initialUserState, initialInventory, initialTiles
+    if(modifiedKeys.includes('userState')) {
+      initialUserState = cloneDeep(userState);
+      setUserState(prev => ({
+        ...prev,
+        xp: modifiedState.xp,
+        gold: modifiedState.gold,
+      }))
+    }
+    if(modifiedKeys.includes('inventory')) {
+      initialInventory = cloneDeep(inventory)
+      setInventory([...modifiedState.inventory])
+    }
+    if(modifiedKeys.includes('tiles')) {
+      initialTiles = cloneDeep(tiles)
+      setTiles(modifiedState.tiles.map(tile => ({...tile})))
+    }
+
+    try {
+      // save in the DataStore
+      const originalPlayerArr = await DataStore.query(PlayerModel)
+      const originalPlayer = originalPlayerArr[0]
+
+      // update the player model in store for the fields specified
+      await DataStore.save(
+        PlayerModel.copyOf(originalPlayer, updated => {
+          updated.gold = modifiedState.gold
+          updated.xp = modifiedState.xp
+          updated.inventory = [...modifiedState.inventory]
+          updated.tiles = modifiedState.tiles.map(tile => ({...tile}))
+        })
+      )
+    } catch (error) {
+      console.error('error saving user state:', error)
+      toast.error('There was an error saving your user state. Contact Nico!')
+
+      // revert to original state
+      if(modifiedKeys.includes('userState') && initialUserState) {
+        setUserState(initialUserState)
+      }
+      if(modifiedKeys.includes('inventory') && initialInventory) {
+        setInventory(initialInventory)
+      }
+      if(modifiedKeys.includes('tiles') && initialTiles) {
+        setTiles(initialTiles)
+      }
+    }
+  }
 
   // Active tile actions
   const cancelTileAction = () => setSelectedTile(emptyTile)
@@ -295,18 +326,16 @@ const FarmTown = ({
 
   const getNextInventoryIndex = () => inventory.findIndex(itemCode => itemCode === 0)
 
-  const addInventoryItem = (itemCode) => {
-    // if inventory is full, alert this to the user
-    if(isInventoryFull())
-      return toast.error('Inventory is full')
+  // const addInventoryItem = (itemCode) => {
+  //   // if inventory is full, alert this to the user
+  //   if(isInventoryFull())
+  //     return toast.error('Inventory is full')
 
-    // Fill next available inventory index
-    const index = getNextInventoryIndex()
-    setInventory(prev => {
-      prev[index] = itemCode
-      return prev;
-    })
-  }
+  //   // Fill next available inventory index
+  //   const index = getNextInventoryIndex()
+  //   const newInventory = inventory.map((prevCode, itemIndex) => itemIndex === index ? itemCode : prevCode)
+  //   saveUserState({ inventory: newInventory, tiles, ...userState }, ['inventory'])
+  // }
 
   const selectInventorySlot = index => {
     // if other selection is in progress, cancel it, so for now that means resetting the selectedTile
@@ -318,29 +347,33 @@ const FarmTown = ({
   }
 
   const sellInventorySlot = (index, gold) => {
-    setUserState(prev => ({ ...prev, gold: prev.gold + gold }))
     setAnimatedText(`+${gold} Gold!`)
-    clearInventorySlot(index)
+    // clearInventorySlot(index)
+    const newInventory = inventory.map((prevCode, itemIndex) => itemIndex === index ? 0 : prevCode)
+    setSelectedInventorySlot(-1)
+    saveUserState({ inventory: newInventory, gold: userState.gold + gold, xp: userState.xp, tiles}, ['userState, inventory'])
   }
 
   // taz will +/- the gold earned by factor of 3
   const feedTazSlot = (index, gold) => {
     const tazFactor = Math.random() > 0.5 ? -1 : 1
     gold = Math.floor(gold - (Math.random() * gold * tazFactor))
-    setUserState(prev => ({ ...prev, gold: prev.gold + gold }))
     setAnimatedText(`+${gold} Gold!`)
-    clearInventorySlot(index)
+    // clearInventorySlot(index)
+    const newInventory = inventory.map((prevCode, itemIndex) => itemIndex === index ? 0 : prevCode)
+    setSelectedInventorySlot(-1)
+    saveUserState({ inventory: newInventory, tiles, gold: userState.gold + gold, xp: userState.xp,}, ['userState', 'inventory'])
   }
 
-  const clearInventorySlot = index => {
-    setInventory(prev => {
-      prev[index] = 0
-      return prev
-    })
-    setSelectedInventorySlot(-1)
-  }
+  // const clearInventorySlot = index => {
+  //   const newInventory = inventory.map((prevCode, itemIndex) => itemIndex === index ? 0 : prevCode)
+  //   saveUserState({ inventory: newInventory, tiles, ...userState}, ['inventory'])
+  //   setSelectedInventorySlot(-1)
+  // }
 
   // Timer logic
+  // NOTE: Timer state will NOT persist for now...
+  // TODO: save timers as well
   const addTimer = (tileId, duration) => {
     if(!tileId) return
     const timerId = nanoid()
@@ -357,6 +390,7 @@ const FarmTown = ({
     return timerId
   }
 
+  // TODO: save timers as well
   const removeTimer = timerId => {
     setTimers(prev => prev.filter(item => item.id !== timerId))
   }
@@ -377,16 +411,15 @@ const FarmTown = ({
     if(crops[tileType].level > userState.level) return;
 
     // IDEA: change plane bg to dirt or something, instead of auto assigning it to the model
-    setMockTiles(prevTiles => {
-      return prevTiles.map(tile => {
-        if(tile.id === selectedTile.id) {
-          tile.plotCode = tileCode
-          tile.plotType = tileType
-        }
+    const newTiles = tiles.map(tile => {
+      if(tile.id === selectedTile.id) {
+        tile.plotCode = tileCode
+        tile.plotType = tileType
+      }
 
-        return tile;
-      })
+      return tile;
     })
+    saveUserState({ tiles: newTiles, inventory, ...userState }, ['tiles'])
 
     const { xp, time, code } = crops[tileType]
 
@@ -394,14 +427,21 @@ const FarmTown = ({
     const timerId = addTimer(selectedTile.id, time)
     setTimeout(() => {
       removeTimer(timerId)
+
       setAnimatedText(`+${xp} XP!`)
 
-      setUserState(prev => ({
-        ...prev,
-        xp: prev.xp + xp,
-      }))
+      // NOTE: Refactored out of addInventoryItem to batch update with DataStore
+      let newInventory;
+      if(isInventoryFull()) {
+        toast.error('Inventory is full, cannot update')
+        newInventory = inventory
+      }
+      else {
+        const index = getNextInventoryIndex()
+        newInventory = inventory.map((prevCode, itemIndex) => itemIndex === index ? code : prevCode)
+      }
 
-      addInventoryItem(code)
+      saveUserState({ inventory: newInventory, xp: userState.xp + xp, gold: userState.gold, tiles }, ['userState', 'inventory'])
 
       setTimeout(() => {
         setAnimatedText('')
@@ -413,16 +453,15 @@ const FarmTown = ({
     if(!selectedTile?.id) return;
     if(selectedTile.plotCode === 0) return;
 
-    setMockTiles(prevTiles => {
-      return prevTiles.map(tile => {
-        if(tile.id === selectedTile.id) {
-          tile.plotCode = 0
-          tile.plotType = 'empty'
-        }
+    const newTiles = tiles.map(tile => {
+      if(tile.id === selectedTile.id) {
+        tile.plotCode = 0
+        tile.plotType = 'empty'
+      }
 
-        return tile;
-      })
+      return tile;
     })
+    saveUserState({ tiles: newTiles, inventory, ...userState }, ['tiles'])    
   }
 
   const getIsActiveTimer = tileId => {
@@ -462,9 +501,9 @@ const FarmTown = ({
       <Farm3d
         selectedTileId={selectedTile.id}
         selectedTilePlotCode={selectedTile.plotCode}
-        mockTiles={mockTiles}
+        tiles={tiles}
         selectTile={selectTile}
-        setMockTiles={setMockTiles}
+        // setTiles={setTiles}
       />
 
       {/* Overlays */}
@@ -483,11 +522,12 @@ const FarmTown = ({
             <RightSidebar
               inventory={inventory}
               selectedInventorySlot={selectedInventorySlot}
+              profileUrl={profileUrl}
+              xp={userState.xp}
               selectInventorySlot={selectInventorySlot}
               closeInventory={closeInventory}
               sellSlot={sellInventorySlot}
               feedTazSlot={feedTazSlot}
-              profileUrl={profileUrl}
             />
           )}
 

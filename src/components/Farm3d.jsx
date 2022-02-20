@@ -74,8 +74,8 @@ export const MAX_TILES_X = 15
 export const MAX_TILES_Y = 15
 
 export const Farm3d = ({
-  mockTiles,
-  setMockTiles,
+  tiles,
+  // setTiles,
   selectedTileId,
   selectedTilePlotCode,
   selectTile,
@@ -167,7 +167,7 @@ export const Farm3d = ({
           box
           multiple
           onChange={handleSelectChange}> */}
-          {mockTiles.map(tile => {
+          {tiles.map(tile => {
             const tileColor = hoveredId === tile.id ? GRASS_COLOR_HIGHLIGHTED : selectedTileId === tile.id ? GRASS_COLOR_SELECTED : GRASS_COLOR
             return (
               <group position={[tile.x,0,tile.y]} key={`${tile.id}`} castShadow receiveShadow>
