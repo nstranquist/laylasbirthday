@@ -205,7 +205,7 @@ const FarmTown = ({
         await signOut()
       }
     }
-
+    console.log('user:', user)
     checkUser()
   }, [user])
 
@@ -310,7 +310,7 @@ const FarmTown = ({
     // make a backup of user state, in case we need to revert back on error
     try {
       // save in the DataStore
-      const originalPlayerArr = await DataStore.query(PlayerModel)
+      const originalPlayerArr = await DataStore.query(PlayerModel, c => c.username("eq", user.username))
       const originalPlayer = originalPlayerArr[0]
 
       // update the player model in store for the fields specified
