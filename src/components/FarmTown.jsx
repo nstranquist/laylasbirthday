@@ -70,7 +70,7 @@ const PlayerModelSchema = {
   xp: 0,
   username: '',
   tiles: generateMockTiles(16, 4, 4),
-  inventory: generateInventory(INVENTORY_SLOTS)
+  inventory: generateInventory(INVENTORY_SLOTS),
 }
 const timersSchema = [
   {
@@ -154,12 +154,13 @@ const FarmTown = ({
   useEffect(() => {
     const queryUserData = async () => {
       try {
-        const queryResult = await DataStore.query(PlayerModel) // , c => c.username("eq", user.username)
+        const queryResult = await DataStore.query(PlayerModel, c => c.username("eq", user.username)) // , c => c.username("eq", user.username)
         if(queryResult?.length === 0) {
           // Init user
           const saveUserResult = await DataStore.save(
             new PlayerModel({
               ...PlayerModelSchema,
+              username: user.username
             })
           )
           setUserState(prev => ({
@@ -193,8 +194,7 @@ const FarmTown = ({
 
     const checkUser = async () => {
       try {
-        const authUser = await Auth.currentAuthenticatedUser()
-        console.log('got auth user:', authUser)
+        await Auth.currentAuthenticatedUser()
         queryUserData()
       }
       catch (error) {
@@ -288,31 +288,10 @@ const FarmTown = ({
     }
   }, [animatedText])
 
-  const cloneDeep = object => JSON.parse(JSON.stringify(object))
-
   // User API update
-  const saveUserState = async (modifiedState, modifiedKeys=[]) => { // ['userState', 'inventory', 'tiles']
+  const saveUserState = async (xp, gold, inventory, tiles) => { // ['userState', 'inventory', 'tiles']
     // optimistically set the user's state, and
     // make a backup of user state, in case we need to revert back on error
-    let initialUserState, initialInventory, initialTiles
-    if(modifiedKeys.includes('userState')) {
-      initialUserState = cloneDeep(userState);
-      setUserState(prev => ({
-        ...prev,
-        xp: modifiedState.xp,
-        gold: modifiedState.gold,
-      }))
-    }
-    if(modifiedKeys.includes('inventory')) {
-      initialInventory = cloneDeep(inventory)
-      console.log('setting inventory state to:', modifiedState.inventory, 'from:', inventory)
-      setInventory([...modifiedState.inventory])
-    }
-    if(modifiedKeys.includes('tiles')) {
-      initialTiles = cloneDeep(tiles)
-      setTiles(modifiedState.tiles.map(tile => ({...tile})))
-    }
-
     try {
       // save in the DataStore
       const originalPlayerArr = await DataStore.query(PlayerModel)
@@ -321,26 +300,15 @@ const FarmTown = ({
       // update the player model in store for the fields specified
       await DataStore.save(
         PlayerModel.copyOf(originalPlayer, updated => {
-          updated.gold = modifiedState.gold
-          updated.xp = modifiedState.xp
-          updated.inventory = [...modifiedState.inventory]
-          updated.tiles = modifiedState.tiles.map(tile => ({...tile}))
+          updated.gold = gold
+          updated.xp = xp
+          updated.inventory = [...inventory]
+          updated.tiles = tiles.map(tile => ({...tile}))
         })
       )
     } catch (error) {
       console.error('error saving user state:', error)
       toast.error('There was an error saving your user state. Contact Nico!')
-
-      // revert to original state
-      if(modifiedKeys.includes('userState') && initialUserState) {
-        setUserState(initialUserState)
-      }
-      if(modifiedKeys.includes('inventory') && initialInventory) {
-        setInventory(initialInventory)
-      }
-      if(modifiedKeys.includes('tiles') && initialTiles) {
-        setTiles(initialTiles)
-      }
     }
   }
 
@@ -363,7 +331,14 @@ const FarmTown = ({
 
   const isInventoryFull = () => !inventory.includes(0)
 
-  const getNextInventoryIndex = () => inventory.findIndex(itemCode => itemCode === 0)
+  const getNextInventoryIndex = (code) => {
+    const foundIndex = inventory.findIndex(itemCode => itemCode === 0)
+    setInventory(prev => {
+      prev[foundIndex] = code
+      return prev;
+    })
+    return foundIndex
+  }
 
   // const addInventoryItem = (itemCode) => {
   //   // if inventory is full, alert this to the user
@@ -387,9 +362,12 @@ const FarmTown = ({
 
   const sellInventorySlot = (index, gold) => {
     setAnimatedText(`+${gold} Gold!`)
-    const newInventory = inventory.map((prevCode, itemIndex) => itemIndex === index ? 0 : prevCode)
+    setInventory(prev => {
+      prev[index] = 0
+      return prev
+    })
     setSelectedInventorySlot(-1)
-    saveUserState({ inventory: newInventory, gold: userState.gold + gold, xp: userState.xp, tiles}, ['userState', 'inventory'])
+    saveUserState( userState.xp, userState.gold + gold, inventory, tiles)
   }
 
   // taz will +/- the gold earned by factor of 3
@@ -397,9 +375,12 @@ const FarmTown = ({
     const tazFactor = Math.random() > 0.5 ? -1 : 1
     gold = Math.floor(gold - (Math.random() * gold * tazFactor))
     setAnimatedText(`+${gold} Gold!`)
-    const newInventory = inventory.map((prevCode, itemIndex) => itemIndex === index ? 0 : prevCode)
+    setInventory(prev => {
+      prev[index] = 0
+      return prev
+    })
     setSelectedInventorySlot(-1)
-    saveUserState({ inventory: newInventory, tiles, gold: userState.gold + gold, xp: userState.xp,}, ['userState', 'inventory'])
+    saveUserState(userState.xp, userState.gold + gold, inventory, tiles)
   }
 
   // const clearInventorySlot = index => {
@@ -447,23 +428,23 @@ const FarmTown = ({
     if(!crops[tileType]) return
     if(crops[tileType].level > userState.level) return;
 
-    const savedSelectedTile = cloneDeep(selectedTile)
-
     // IDEA: change plane bg to dirt or something, instead of auto assigning it to the model
-    const newTiles = tiles.map(tile => {
-      if(tile.id === savedSelectedTile.id) {
-        tile.plotCode = tileCode
-        tile.plotType = tileType
-      }
+    setTiles(prev => {
+      return prev.map(tile => {
+        if(tile.id === selectedTile.id) {
+          tile.plotCode = tileCode
+          tile.plotType = tileType
+        }
 
-      return tile;
+        return tile;
+      })
     })
-    saveUserState({ tiles: newTiles, inventory, ...userState }, ['tiles'])
+    saveUserState(userState.xp, userState.gold, inventory, tiles)
 
     const { xp, time, code } = crops[tileType]
 
     // setTimer
-    const timerId = addTimer(savedSelectedTile.id, time)
+    const timerId = addTimer(selectedTile.id, time)
     setTimeout(() => {
       removeTimer(timerId)
       
@@ -478,16 +459,21 @@ const FarmTown = ({
       }
       else {
         // Set New Tiles... TODO! Set State, THEN do the tile shit
-        const index = getNextInventoryIndex()
-        const newInventory = inventory.map((prevCode, itemIndex) => itemIndex === index ? code : prevCode)
-        const newTiles = tiles.map(tile => {
-          if(tile.id === savedSelectedTile.id) {
-            tile.plotCode = 0
-            tile.plotType = 'empty'
-          }
-          return tile
+        const index = getNextInventoryIndex(code)
+        setInventory(prev => {
+          prev[index] = code
+          return prev;
         })
-        saveUserState({ inventory: newInventory, tiles: newTiles, xp: userState.xp + xp, gold: userState.gold }, ['userState', 'inventory', 'tiles'])
+        setTiles(prev => {
+          return prev.map(tile => {
+            if(tile.id === selectedTile.id) {
+              tile.plotCode = 0
+              tile.plotType = 'empty'
+            }
+            return tile
+          })
+        })
+        saveUserState(userState.xp + xp, userState.gold, inventory, tiles )
       }
     }, (time * 1000))
   }
@@ -496,15 +482,17 @@ const FarmTown = ({
     if(!selectedTile?.id) return;
     if(selectedTile.plotCode === 0) return;
 
-    const newTiles = tiles.map(tile => {
-      if(tile.id === selectedTile.id) {
-        tile.plotCode = 0
-        tile.plotType = 'empty'
-      }
+    setTiles(prev => {
+      return prev.map(tile => {
+        if(tile.id === selectedTile.id) {
+          tile.plotCode = 0
+          tile.plotType = 'empty'
+        }
 
-      return tile;
+        return tile;
+      })
     })
-    saveUserState({ tiles: newTiles, inventory, ...userState }, ['tiles'])    
+    saveUserState(userState.xp, userState.gold, inventory, tiles)    
   }
 
   const getIsActiveTimer = tileId => {
