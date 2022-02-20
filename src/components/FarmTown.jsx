@@ -172,8 +172,8 @@ const FarmTown = ({
             xp: saveUserResult.xp,
             gold: saveUserResult.gold,
           }))
-          setTiles(saveUserResult.tiles)
-          setInventory(saveUserResult.inventory)
+          setTiles(saveUserResult.tiles.map(tile => ({...tile})))
+          setInventory([...saveUserResult.inventory])
         }
         else {
           const userProfile = queryResult[0]
@@ -217,7 +217,6 @@ const FarmTown = ({
         if(!images || images.length === 0) {
           toast.error('No files exist for this user yet!')
         }
-        console.log('found images:', images)
         // for each file with key found, retrieve the image
         await new Promise((resolve, reject) => {
           images.filter(image => image.key && image.key !== 'present').forEach(async (image, index) => {
@@ -226,7 +225,6 @@ const FarmTown = ({
             const isFolder = key.slice(-1) === '/' ? true : false
 
             if(isFolder) {
-              console.log('found a folder with key:', key)
               return;
             }
             
@@ -234,7 +232,6 @@ const FarmTown = ({
             try {
               const imageResult = await Storage.get(key, { level: 'private' }) // image result is the SIGNED url!
               if(!imageResult) throw new Error('Could not find that image!')
-              console.log('image result:', imageResult)
               // TODO assign the profile's s3 key in the user's dynamodb model
               if(key === 'profile' || key.split('.')[0] === 'profile') {
                 // set the image to state
@@ -255,7 +252,6 @@ const FarmTown = ({
                   {key, file: imageResult}
                 ]))
               }
-              console.log('crankthat:', crankThat)
             } catch (error) {
               console.error('error in individual file retrieval:', error)
               toast.error(`There was an error getting your file: ${key}`)
@@ -502,7 +498,6 @@ const FarmTown = ({
           })
         })
         const newXp = userState.xp + xp
-        console.log('setting new xp user state:', newXp)
         setUserState(prev => ({
           ...prev,
           xp: prev.xp + xp
@@ -548,7 +543,6 @@ const FarmTown = ({
       if(!images || images.length === 0) {
         toast.error('No files exist for this user yet!')
       }
-      console.log('found images:', images)
       const presentImage = images.find(image => image.key === 'present')
 
       if(!presentImage)
@@ -557,7 +551,6 @@ const FarmTown = ({
       // Get the found present image, to display
       const imageResult = await Storage.get('present', { level: 'private' }) // image result is the SIGNED url!
       if(!imageResult) throw new Error('Could not find that image!')
-      console.log('image result:', imageResult)
 
       setPresent(imageResult)
       setShowPresentDisplay(true)
