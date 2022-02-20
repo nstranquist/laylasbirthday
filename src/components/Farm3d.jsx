@@ -171,7 +171,7 @@ export const Farm3d = ({
             const tileColor = hoveredId === tile.id ? GRASS_COLOR_HIGHLIGHTED : selectedTileId === tile.id ? GRASS_COLOR_SELECTED : GRASS_COLOR
             return (
               <group position={[tile.x,0,tile.y]} key={`${tile.id}`} castShadow receiveShadow>
-                {tile.plotCode !== 0 && <CropTile code={tile.plotCode} />}
+                {tile.plotCode !== 0 && tile.plotCode !== 9 && <CropTile code={tile.plotCode} />}
                 <mesh
                   castShadow
                   receiveShadow 

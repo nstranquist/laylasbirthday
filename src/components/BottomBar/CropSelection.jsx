@@ -17,7 +17,7 @@ export const CropSelection = ({
         <button className="close-button" onClick={() => getNextCrop()}>Next</button>
       </header>
 
-        {currentLevel >= cropItem.level ? (
+        {currentLevel && currentLevel >= cropItem?.level ? (
           <div className="bottom-bar-body">
             <div className="farm-details-container">
               <div className="farm-details-left">

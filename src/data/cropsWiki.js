@@ -7,6 +7,7 @@ import { ReactComponent as KaleSvg } from '../assets/crops/kale.svg'
 import { ReactComponent as PotatoSvg } from '../assets/crops/potato.svg'
 import { ReactComponent as EggSvg } from '../assets/crops/egg.svg'
 import { ReactComponent as HeckberrySvg } from '../assets/crops/heckberry.svg'
+import { ReactComponent as PresentSvg } from '../assets/ui-icons/present.svg'
 
 
 /**
@@ -66,7 +67,7 @@ export const crops = {
     desc: "No one ever tell you to grow eggs? Such a shame. Much simpler than using chickens...",
     code: 4,
     price: 60,
-    xp: 100,
+    xp: 115,
     time: 8,
     gold: 45,
     level: 7,
@@ -79,8 +80,8 @@ export const crops = {
     desc: "Tall and useless. Not sure why we grow these things... Don't run into aliens roaming the fields.",
     code: 5,
     price: 80,
-    xp: 145,
-    time: 13,
+    xp: 165,
+    time: 11,
     gold: 90,
     level: 9,
     SvgImage: CornSvg
@@ -92,8 +93,8 @@ export const crops = {
     desc: "Juicy, red, sweet, scrumptious, delectable, luscious, succulent little morsels!",
     code: 6,
     price: 100,
-    xp: 180,
-    time: 18,
+    xp: 225,
+    time: 16,
     gold: 125,
     level: 11,
     SvgImage: StrawberrySvg
@@ -105,8 +106,8 @@ export const crops = {
     desc: "Almost as much to say about it as the strawberry. Some might argue its better, but it doesn't go with as many other things. I rest my case.",
     code: 7,
     price: 140,
-    xp: 245,
-    time: 24,
+    xp: 295,
+    time: 21,
     gold: 1000,
     level: 12,
     SvgImage: BlueberrySvg
@@ -118,14 +119,24 @@ export const crops = {
     desc: "Heck is this? After close evaluation, it seems this is the strange fruit of the mystery tree only found in labs! It is said to have unpredictable effects :O",
     code: 8,
     price: 180,
-    xp: 450, //(() => Math.floor(Math.random()*200 + 450))(),
+    xp: 525, //(() => Math.floor(Math.random()*200 + 450))(),
     gold: 2250, //(() => Math.floor(Math.random()*500 + 2000))(),
-    time: 34,
+    time: 26,
     level: 13,
     SvgImage: HeckberrySvg // Make it like a huckleberry or something.
   },
-  // 
-
+  present: {
+    id: "present",
+    name: "Present",
+    desc: "HAPPY 14TH BIRTHDAY LAYLA!!",
+    code: 9,
+    price: 0,
+    xp: 0,
+    gold: 0,
+    time: 14,
+    level: 14,
+    SvgImage: PresentSvg
+  },
 
   // ...
   empty: {

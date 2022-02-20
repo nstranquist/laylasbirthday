@@ -25,6 +25,7 @@ import { nanoid } from '../utils/nanoid'
 import { Timer } from './Timer'
 import { SvgButton } from './SvgButton'
 import { ReactComponent as BackpackSvg } from '../assets/ui-icons/backpack.svg'
+import { PresentDisplay } from './displays/Present.jsx'
 
 // levels by amount of xp. level[0] = xp at level 1, which is 0xp
 // at most 2 levels in between a new unlock
@@ -39,9 +40,9 @@ export const levels = [
   445, // 9 - corn (x3 egg @475xp)
   720, // 10
   1165, // 11 - strawberry (x5 corn @1200xp)
-  1885, // 12 - blueberry (x4 strawberry @1920xp)
-  3050, // 13 - heckberry (x5 blueberry @3145xp)
-  4935, // level 14 --> BIRTHDAYYYY, no need to plant anything. Airdrop present into Inventory, show snackbar
+  1485, // 12 - blueberry (x4 strawberry @1920xp)
+  1950, // 13 - heckberry (x5 blueberry @3145xp)
+  2650, // level 14 --> BIRTHDAYYYY, no need to plant anything. Airdrop present into Inventory, show snackbar
 ]
 // Level 1
 // 45 xp needed til level 2
@@ -97,11 +98,14 @@ const FarmTown = ({
   const [showHelp, setShowHelp] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
   const [showInventory, setShowInventory] = useState(true)
+  const [showPresentDisplay, setShowPresentDisplay] = useState(true)
   const [showBuildings, setShowBuildings] = useState(false)
   const [showCrops, setShowCrops] = useState(false)
   const [selectedInventorySlot, setSelectedInventorySlot] = useState(-1)
   const [profileUrl, setProfileUrl] = useState('')
   const [userImages, setUserImages] = useState([]) // { key: '', file: '' }
+
+  const [present, setPresent] = useState(null)
 
   const [timers, setTimers] = useState([])
   const [currentLevel, setCurrentLevel] = useState(0)
@@ -214,7 +218,7 @@ const FarmTown = ({
         console.log('found images:', images)
         // for each file with key found, retrieve the image
         await new Promise((resolve, reject) => {
-          images.filter(image => image.key).forEach(async (image, index) => {
+          images.filter(image => image.key && image.key !== 'present').forEach(async (image, index) => {
             const { key } = image;
 
             const isFolder = key.slice(-1) === '/' ? true : false
@@ -379,9 +383,12 @@ const FarmTown = ({
       return prev
     })
     setSelectedInventorySlot(-1)
-    const newGold = userState.gold + gold
-    const newXp = userState.xp + gold
-    setUserState({gold: newGold, xp: newXp})
+    let newXp, newGold
+    setUserState(prev => {
+      newXp = prev.xp + gold
+      newGold = prev.gold + gold
+      return {gold: newGold, xp: newXp}
+    })
     saveUserState(newXp, newGold, inventory, tiles)
   }
 
@@ -476,9 +483,10 @@ const FarmTown = ({
           })
         })
         const newXp = userState.xp + xp
+        console.log('setting new xp user state:', newXp)
         setUserState(prev => ({
           ...prev,
-          xp: newXp
+          xp: prev.xp + xp
         }))
         saveUserState(newXp, userState.gold, inventory, tiles )
       }
@@ -514,6 +522,36 @@ const FarmTown = ({
     return foundTimer
   }
 
+  const getPresent = async () => {
+    // get present from S3
+    try {
+      const images = await Storage.list('', { level: 'private' })
+      if(!images || images.length === 0) {
+        toast.error('No files exist for this user yet!')
+      }
+      console.log('found images:', images)
+      const presentImage = images.find(image => image.key === 'present')
+
+      if(!presentImage)
+        throw new Error('Could not find present')
+
+      // Get the found present image, to display
+      const imageResult = await Storage.get('present', { level: 'private' }) // image result is the SIGNED url!
+      if(!imageResult) throw new Error('Could not find that image!')
+      console.log('image result:', imageResult)
+
+      setPresent(imageResult)
+      setShowPresentDisplay(true)
+      
+      setUserImages(prev => ([
+        ...prev,
+        {key: 'present', file: imageResult}
+      ]))
+    } catch (error) {
+      toast.error('Oh no! There was an error getting your present! :((')
+    }
+  }
+
   // const uploadFile = async e => {
   //   const file = e.target.files[0]
   //   if(!file) return;
@@ -531,6 +569,7 @@ const FarmTown = ({
       {showProfile && <ProfileDisplay userImages={userImages} closeProfile={closeProfile} />}
       {showCrops && <CropsDisplay closeDisplay={() => setShowCrops(false)} />}
       {showBuildings && <BuildingsDisplay closeDisplay={() => setShowBuildings(false)} />}
+      {present && showPresentDisplay && <PresentDisplay present={present} closeDisplay={() => setShowPresentDisplay(false)} />}
 
       {animatedText && (
         <AnimatedGameText text={animatedText.split('\n')} DURATION={ANIMATED_TEXT_DURATION} />
@@ -565,6 +604,7 @@ const FarmTown = ({
               currentLevel={currentLevel}
               selectInventorySlot={selectInventorySlot}
               closeInventory={closeInventory}
+              getPresent={getPresent}
               sellSlot={sellInventorySlot}
               feedTazSlot={feedTazSlot}
             />

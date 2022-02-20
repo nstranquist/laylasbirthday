@@ -16,6 +16,7 @@ export const codesMap = {
   6: 'strawberry',
   7: 'blueberry',
   8: 'heckberry',
+  9: 'present'
 }
 
 export const inventoryOptions = [
@@ -32,10 +33,11 @@ export const RightSidebar = ({
   selectInventorySlot,
   sellSlot,
   feedTazSlot,
+  getPresent
 }) => {
 
   const getCropImage = code => {
-    if(!code || code < 0 || code > 8)
+    if(!code || code < 0 || code > 9)
       return;
 
     const cropId = codesMap[code]
@@ -136,14 +138,23 @@ export const RightSidebar = ({
               <p className="right-sidebar-footer-text" style={{marginBottom:16}}>
                 Selected {getSlotText(selectedInventorySlot)}.
               </p>
-              <div className="right-sidebar-action-bar">
-                <button onClick={() => handleFeedTazSlot(selectedInventorySlot)} style={{marginRight: 12}} className="footer-action-button">Feed Taz</button>
-                <button onClick={() => handleSellSlot(selectedInventorySlot)} className="footer-action-button flex-button">
-                  <span style={{marginRight:5}}>Sell</span>
-                  <img src={'/ui-icons/coin.png'} height={18} width={18} alt="gold icon" />
-                  <span>{getSlotSellPrice(selectedInventorySlot)}</span>
-                </button>
-              </div>
+              {inventory[selectedInventorySlot] === 9 ? (
+                <div className="right-sidebar-action-bar">
+                  <button className="footer-action-button" onClick={() => getPresent()}>
+                  <span style={{marginRight:5, textTransform: 'uppercase'}}>GET PRESENT</span>
+                  <img src={'/ui-icons/present.svg'} height={18} width={18} alt="present icon" />
+                  </button>
+                </div>
+              ) : (
+                <div className="right-sidebar-action-bar">
+                  <button onClick={() => handleFeedTazSlot(selectedInventorySlot)} style={{marginRight: 12}} className="footer-action-button">Feed Taz</button>
+                  <button onClick={() => handleSellSlot(selectedInventorySlot)} className="footer-action-button flex-button">
+                    <span style={{marginRight:5}}>Sell</span>
+                    <img src={'/ui-icons/coin.png'} height={18} width={18} alt="gold icon" />
+                    <span>{getSlotSellPrice(selectedInventorySlot)}</span>
+                  </button>
+                </div>
+              )}
             </>
           ) : (
             <p className="right-sidebar-footer-text">
