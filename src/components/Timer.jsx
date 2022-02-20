@@ -20,12 +20,10 @@ export const Timer = ({
         const newTime = Math.ceil(prev - 1)
         if(timeLeft <= 0) {
           // stopTimer()
-          console.log('time is lowww')
         }
         return newTime;
       })
       if(timeLeft <= 0) {
-        console.log('removing timer')
         removeTimer()
       }
     }, 1000)

@@ -42,6 +42,13 @@ export const schema = {
                     "attributes": [],
                     "isArrayNullable": true
                 },
+                "username": {
+                    "name": "username",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -145,5 +152,5 @@ export const schema = {
             }
         }
     },
-    "version": "9f2cc19f0bf5ebc25639c98640783604"
+    "version": "2f227b4f8fa13c144ee69c984b3fea6b"
 };

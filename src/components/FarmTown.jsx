@@ -127,14 +127,12 @@ const FarmTown = ({
         if (levelIndex === -1)
           currentLevel = 14
         else
-          currentLevel = levelIndex
+          currentLevel = levelIndex + 1
       }
-  
       return currentLevel
     }
 
-    if(userState.xp)
-      setCurrentLevel(getCurrentLevel(userState.xp))
+    setCurrentLevel(getCurrentLevel(userState.xp))
   }, [userState.xp])
 
   useEffect(() => {
@@ -173,7 +171,6 @@ const FarmTown = ({
         }
         else {
           const userProfile = queryResult[0]
-          console.log('query result:', queryResult)
           setUserState(prev => ({
             ...prev,
             xp: userProfile.xp,
@@ -367,20 +364,25 @@ const FarmTown = ({
       return prev
     })
     setSelectedInventorySlot(-1)
-    saveUserState( userState.xp, userState.gold + gold, inventory, tiles)
+    const newGold = userState.gold + gold
+    setUserState(prev => ({...prev, gold: newGold}))
+    saveUserState( userState.xp, newGold, inventory, tiles)
   }
 
   // taz will +/- the gold earned by factor of 3
   const feedTazSlot = (index, gold) => {
     const tazFactor = Math.random() > 0.5 ? -1 : 1
     gold = Math.floor(gold - (Math.random() * gold * tazFactor))
-    setAnimatedText(`+${gold} Gold!`)
+    setAnimatedText(`+${gold} Gold!\n+${gold} XP!`)
     setInventory(prev => {
       prev[index] = 0
       return prev
     })
     setSelectedInventorySlot(-1)
-    saveUserState(userState.xp, userState.gold + gold, inventory, tiles)
+    const newGold = userState.gold + gold
+    const newXp = userState.xp + gold
+    setUserState({gold: newGold, xp: newXp})
+    saveUserState(newXp, newGold, inventory, tiles)
   }
 
   // const clearInventorySlot = index => {
@@ -473,7 +475,12 @@ const FarmTown = ({
             return tile
           })
         })
-        saveUserState(userState.xp + xp, userState.gold, inventory, tiles )
+        const newXp = userState.xp + xp
+        setUserState(prev => ({
+          ...prev,
+          xp: newXp
+        }))
+        saveUserState(newXp, userState.gold, inventory, tiles )
       }
     }, (time * 1000))
   }

@@ -22,6 +22,7 @@ export declare class Player {
   readonly xp?: number;
   readonly inventory?: (number | null)[];
   readonly tiles?: (Tile | null)[];
+  readonly username?: string;
   readonly createdAt?: string;
   readonly updatedAt?: string;
   constructor(init: ModelInit<Player, PlayerMetaData>);
