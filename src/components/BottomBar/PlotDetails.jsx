@@ -20,7 +20,7 @@ export const PlotDetails = ({
         {isActiveTimer ? (
           <div className="farm-details-container" style={{justifyContent:'center'}}>
             <div className="farm-details-center">
-              <Timer timer={timer} removeTimer={removeTimer} />
+              <Timer timerDuration={timer.duration} timerStartTime={timer.startTime} removeTimer={removeTimer} />
             </div>
           </div>
         ) : (

@@ -18,7 +18,8 @@ export const BottomBar = ({
   clearPlot,
   isActiveTimer,
   removeTimer,
-  timer
+  timer,
+  currentLevel
 }) => {
   const [cropItem, setCropItem] = useState(crops[cropKeys[0]])
 
@@ -53,6 +54,7 @@ export const BottomBar = ({
           ) : (
           <CropSelection
             cropItem={cropItem}
+            currentLevel={currentLevel}
             getNextCrop={getNextCrop}
             getPreviousCrop={getPreviousCrop}
             buildPlot={buildPlot}

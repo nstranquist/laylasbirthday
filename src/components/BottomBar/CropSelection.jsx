@@ -5,7 +5,8 @@ export const CropSelection = ({
   getNextCrop,
   getPreviousCrop,
   buildPlot,
-  cancelTileAction
+  cancelTileAction,
+  currentLevel
 }) => {
 
   return (
@@ -16,43 +17,80 @@ export const CropSelection = ({
         <button className="close-button" onClick={() => getNextCrop()}>Next</button>
       </header>
 
-      <div className="bottom-bar-body">
-        <div className="farm-details-container">
-          <div className="farm-details-left">
-            <div className="farm-details-image">{<cropItem.SvgImage />}</div>
-          </div>
-          <div className="farm-details-right">
-            <div className="farm-detail-top">
-              <h6 className="farm-detail-title">
-                {cropItem.name}
-              </h6>
-              <div className="farm-detail-stats">
-                <h6 className="farm-detail-stat-item">
-                  <img src={'/ui-icons/coin.png'} height={22} width={22} alt="gold" />  
-                  <span className="farm-detail-stat-text">{cropItem.gold}</span>
-                </h6>
-                <h6 className="farm-detail-stat-item">
-                  <img src={'/ui-icons/xp-gold.png'} height={22} width={22} alt="xp" />
-                  <span className="farm-detail-stat-text">{cropItem.xp}</span>
-                </h6>
-                <h6 className="farm-detail-stat-item">
-                  <img src={'/ui-icons/clock.svg'} height={22} width={22} alt="time" />
-                  <span className="farm-detail-stat-text">{cropItem.time}</span>
-                </h6>
+        {currentLevel >= cropItem.level ? (
+          <div className="bottom-bar-body">
+            <div className="farm-details-container">
+              <div className="farm-details-left">
+                <div className="farm-details-image">{<cropItem.SvgImage />}</div>
+              </div>
+              <div className="farm-details-right">
+                <div className="farm-detail-top">
+                  <h6 className="farm-detail-title">
+                    {cropItem.name}
+                  </h6>
+                  <div className="farm-detail-stats">
+                    <h6 className="farm-detail-stat-item">
+                      <img src={'/ui-icons/coin.png'} height={22} width={22} alt="gold" />  
+                      <span className="farm-detail-stat-text">{cropItem.gold}</span>
+                    </h6>
+                    <h6 className="farm-detail-stat-item">
+                      <img src={'/ui-icons/xp-gold.png'} height={22} width={22} alt="xp" />
+                      <span className="farm-detail-stat-text">{cropItem.xp}</span>
+                    </h6>
+                    <h6 className="farm-detail-stat-item">
+                      <img src={'/ui-icons/clock.svg'} height={22} width={22} alt="time" />
+                      <span className="farm-detail-stat-text">{cropItem.time}</span>
+                    </h6>
+                  </div>
+                </div>
+                <p className="farm-detail-desc">{cropItem.desc}</p>
               </div>
             </div>
-            <p className="farm-detail-desc">{cropItem.desc}</p>
+            <ul className="bottom-bar-actions-list">
+              <li className="bottom-bar-actions-item" onClick={() => cancelTileAction()}>Cancel</li>
+              <li className={"bottom-bar-actions-item noselect primary-button"}
+                onClick={() => buildPlot(cropItem.code, cropItem.id)}
+              >
+                Plant {cropItem.name}
+              </li>
+            </ul>
           </div>
-        </div>
-        <ul className="bottom-bar-actions-list">
-          <li className="bottom-bar-actions-item" onClick={() => cancelTileAction()}>Cancel</li>
-          <li className={"bottom-bar-actions-item noselect primary-button"}
-            onClick={() => buildPlot(cropItem.code, cropItem.id)}
-          >
-            Plant {cropItem.name}
-          </li>
-        </ul>
-      </div>
+        ) : (
+          <div className="bottom-bar-body">
+            <div className="farm-details-container">
+              <div className="farm-details-left">
+                <div className="farm-details-image">{<cropItem.SvgImage />}</div>
+              </div>
+              <div className="farm-details-right">
+                <div className="farm-detail-top">
+                  <h6 className="farm-detail-title">
+                    Locked
+                  </h6>
+                  <div className="farm-detail-stats">
+                    <h6 className="farm-detail-stat-item">
+                      <img src={'/ui-icons/coin.png'} height={22} width={22} alt="gold" />  
+                      <span className="farm-detail-stat-text">???</span>
+                    </h6>
+                    <h6 className="farm-detail-stat-item">
+                      <img src={'/ui-icons/xp-gold.png'} height={22} width={22} alt="xp" />
+                      <span className="farm-detail-stat-text">???</span>
+                    </h6>
+                    <h6 className="farm-detail-stat-item">
+                      <img src={'/ui-icons/clock.svg'} height={22} width={22} alt="time" />
+                      <span className="farm-detail-stat-text">???</span>
+                    </h6>
+                  </div>
+                </div>
+                <p className="farm-detail-desc">Locked</p>
+              </div>
+            </div>
+            <ul className="bottom-bar-actions-list">
+              <li className={"bottom-bar-actions-item noselect primary-button"}>
+                Locked until lvl {cropItem.level}
+              </li>
+            </ul>
+          </div>
+        )}
     </>
   )
 }

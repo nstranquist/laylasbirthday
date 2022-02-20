@@ -28,6 +28,7 @@ export const RightSidebar = ({
   selectedInventorySlot,
   profileUrl,
   xp,
+  currentLevel,
   selectInventorySlot,
   sellSlot,
   feedTazSlot,
@@ -78,18 +79,7 @@ export const RightSidebar = ({
   }
 
   // returns react component with the current level, the xp remaining til the next level
-  const getLevelText = (xp) => {
-    let currentLevel;
-    if(xp < 0)
-      currentLevel = 0
-    else {
-      const levelIndex = levels.findIndex(level => level >= xp)
-      if (levelIndex === -1)
-        currentLevel = 14
-      else
-        currentLevel = levelIndex
-    }
-
+  const getLevelText = (xp, currentLevel) => {
     let nextLevelXp;
     if(currentLevel === 14)
       nextLevelXp = 'MAXED'
@@ -121,7 +111,7 @@ export const RightSidebar = ({
             )}
           </div>
           {/* Level Container */}
-          {getLevelText(xp)}
+          {getLevelText(xp, currentLevel)}
         </div>
       </div>
       <div className="right-sidebar-backpack">

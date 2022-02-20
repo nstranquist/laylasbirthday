@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import classnames from 'classnames'
 import toast from 'react-hot-toast'
 import { useDetectGPU } from '@react-three/drei'
-import { Storage, DataStore, /*API*/ } from 'aws-amplify'
+import { Storage, DataStore, Auth /*API*/ } from 'aws-amplify'
 import { Player as PlayerModel } from '../models/index.js'
 import { Farm3d, emptyTile, generateMockTiles } from './Farm3d'
 import {
@@ -27,20 +27,21 @@ import { SvgButton } from './SvgButton'
 import { ReactComponent as BackpackSvg } from '../assets/ui-icons/backpack.svg'
 
 // levels by amount of xp. level[0] = xp at level 1, which is 0xp
+// at most 2 levels in between a new unlock
 export const levels = [
-  15,
-  25,
-  40,
-  65,
-  105,
-  170,
-  275,
-  445,
-  720,
-  1165,
-  1885,
-  3050,
-  4935, // level 14
+  15, // 2
+  25, // 3 - potato (x2 carrots @30xp)
+  40, // 4
+  65, // 5 - kale (x2 potatos @75xp)
+  105, // 6
+  170, // 7 - egg (x2 kale @175xp)
+  275, // 8
+  445, // 9 - corn (x3 egg @475xp)
+  720, // 10
+  1165, // 11 - strawberry (x5 corn @1200xp)
+  1885, // 12 - blueberry (x4 strawberry @1920xp)
+  3050, // 13 - heckberry (x5 blueberry @3145xp)
+  4935, // level 14 --> BIRTHDAYYYY, no need to plant anything. Airdrop present into Inventory, show snackbar
 ]
 // Level 1
 // 45 xp needed til level 2
@@ -103,6 +104,7 @@ const FarmTown = ({
   const [userImages, setUserImages] = useState([]) // { key: '', file: '' }
 
   const [timers, setTimers] = useState([])
+  const [currentLevel, setCurrentLevel] = useState(0)
 
   const [inventory, setInventory] = useState(generateInventory(INVENTORY_SLOTS))
 
@@ -110,6 +112,30 @@ const FarmTown = ({
   const [settingAnimatedText, setSettingAnimatedText] = useState(false)
 
   const [cropIndex, setCropIndex] = useState(0)
+
+  // useEffect(() => {
+  //   console.log('timers:', timers)
+  // }, [timers])
+
+  useEffect(() => {
+    const getCurrentLevel = (xp) => {
+      let currentLevel;
+      if(xp < 0)
+        currentLevel = 0
+      else {
+        const levelIndex = levels.findIndex(level => level >= xp)
+        if (levelIndex === -1)
+          currentLevel = 14
+        else
+          currentLevel = levelIndex
+      }
+  
+      return currentLevel
+    }
+
+    if(userState.xp)
+      setCurrentLevel(getCurrentLevel(userState.xp))
+  }, [userState.xp])
 
   useEffect(() => {
     console.log('welcome to farmtown')
@@ -146,6 +172,7 @@ const FarmTown = ({
         }
         else {
           const userProfile = queryResult[0]
+          console.log('query result:', queryResult)
           setUserState(prev => ({
             ...prev,
             xp: userProfile.xp,
@@ -164,8 +191,19 @@ const FarmTown = ({
       }
     }
 
-    if(user)
-      queryUserData()
+    const checkUser = async () => {
+      try {
+        const authUser = await Auth.currentAuthenticatedUser()
+        console.log('got auth user:', authUser)
+        queryUserData()
+      }
+      catch (error) {
+        console.error('error getting current auth user:', error)
+        await signOut()
+      }
+    }
+
+    checkUser()
   }, [user])
 
   useEffect(() => {
@@ -267,6 +305,7 @@ const FarmTown = ({
     }
     if(modifiedKeys.includes('inventory')) {
       initialInventory = cloneDeep(inventory)
+      console.log('setting inventory state to:', modifiedState.inventory, 'from:', inventory)
       setInventory([...modifiedState.inventory])
     }
     if(modifiedKeys.includes('tiles')) {
@@ -348,10 +387,9 @@ const FarmTown = ({
 
   const sellInventorySlot = (index, gold) => {
     setAnimatedText(`+${gold} Gold!`)
-    // clearInventorySlot(index)
     const newInventory = inventory.map((prevCode, itemIndex) => itemIndex === index ? 0 : prevCode)
     setSelectedInventorySlot(-1)
-    saveUserState({ inventory: newInventory, gold: userState.gold + gold, xp: userState.xp, tiles}, ['userState, inventory'])
+    saveUserState({ inventory: newInventory, gold: userState.gold + gold, xp: userState.xp, tiles}, ['userState', 'inventory'])
   }
 
   // taz will +/- the gold earned by factor of 3
@@ -359,7 +397,6 @@ const FarmTown = ({
     const tazFactor = Math.random() > 0.5 ? -1 : 1
     gold = Math.floor(gold - (Math.random() * gold * tazFactor))
     setAnimatedText(`+${gold} Gold!`)
-    // clearInventorySlot(index)
     const newInventory = inventory.map((prevCode, itemIndex) => itemIndex === index ? 0 : prevCode)
     setSelectedInventorySlot(-1)
     saveUserState({ inventory: newInventory, tiles, gold: userState.gold + gold, xp: userState.xp,}, ['userState', 'inventory'])
@@ -384,7 +421,7 @@ const FarmTown = ({
         tileId: tileId,
         duration: duration,
         startTime: getSeconds(),
-        secondsLeft: duration
+        // secondsLeft: duration
       }
     ]))
     return timerId
@@ -410,9 +447,11 @@ const FarmTown = ({
     if(!crops[tileType]) return
     if(crops[tileType].level > userState.level) return;
 
+    const savedSelectedTile = cloneDeep(selectedTile)
+
     // IDEA: change plane bg to dirt or something, instead of auto assigning it to the model
     const newTiles = tiles.map(tile => {
-      if(tile.id === selectedTile.id) {
+      if(tile.id === savedSelectedTile.id) {
         tile.plotCode = tileCode
         tile.plotType = tileType
       }
@@ -424,28 +463,32 @@ const FarmTown = ({
     const { xp, time, code } = crops[tileType]
 
     // setTimer
-    const timerId = addTimer(selectedTile.id, time)
+    const timerId = addTimer(savedSelectedTile.id, time)
     setTimeout(() => {
       removeTimer(timerId)
-
+      
       setAnimatedText(`+${xp} XP!`)
-
-      // NOTE: Refactored out of addInventoryItem to batch update with DataStore
-      let newInventory;
-      if(isInventoryFull()) {
-        toast.error('Inventory is full, cannot update')
-        newInventory = inventory
-      }
-      else {
-        const index = getNextInventoryIndex()
-        newInventory = inventory.map((prevCode, itemIndex) => itemIndex === index ? code : prevCode)
-      }
-
-      saveUserState({ inventory: newInventory, xp: userState.xp + xp, gold: userState.gold, tiles }, ['userState', 'inventory'])
-
       setTimeout(() => {
         setAnimatedText('')
       }, ANIMATED_TEXT_DURATION)
+
+      // NOTE: Refactored out of addInventoryItem to batch update with DataStore
+      if(isInventoryFull()) {
+        toast.error('Inventory is full, cannot harvest')
+      }
+      else {
+        // Set New Tiles... TODO! Set State, THEN do the tile shit
+        const index = getNextInventoryIndex()
+        const newInventory = inventory.map((prevCode, itemIndex) => itemIndex === index ? code : prevCode)
+        const newTiles = tiles.map(tile => {
+          if(tile.id === savedSelectedTile.id) {
+            tile.plotCode = 0
+            tile.plotType = 'empty'
+          }
+          return tile
+        })
+        saveUserState({ inventory: newInventory, tiles: newTiles, xp: userState.xp + xp, gold: userState.gold }, ['userState', 'inventory', 'tiles'])
+      }
     }, (time * 1000))
   }
 
@@ -524,6 +567,7 @@ const FarmTown = ({
               selectedInventorySlot={selectedInventorySlot}
               profileUrl={profileUrl}
               xp={userState.xp}
+              currentLevel={currentLevel}
               selectInventorySlot={selectInventorySlot}
               closeInventory={closeInventory}
               sellSlot={sellInventorySlot}
@@ -539,7 +583,7 @@ const FarmTown = ({
               buttonStyles={{marginBottom: '1rem', marginTop: '0.5rem'}}
             />
             {timers.map((timer, index) => (
-              <Timer timer={timer} removeTimer={removeTimer} key={`timer-${index}`} showDebug={false} />
+              <Timer timerDuration={timer.duration} timerStartTime={timer.startTime} removeTimer={removeTimer} key={`timer-${index}`} showDebug={false} />
             ))}
             
           </div>
@@ -559,6 +603,7 @@ const FarmTown = ({
           isActiveTimer={getIsActiveTimer(selectedTile.id)}
           removeTimer={removeTimer}
           timer={getActiveTimer(selectedTile.id)}
+          currentLevel={currentLevel}
         />
       )}
     </StyledFarmTown>
