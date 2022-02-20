@@ -17,22 +17,20 @@ export const Timer = ({
     setTimeLeft(Math.ceil(endTime - getSeconds()))
 
     const interval = setInterval(() => {
-      setTimeLeft(Math.ceil(endTime - getSeconds()))
+      setTimeLeft(prev => {
+        const newTime = Math.ceil(endTime - getSeconds())
+        if(timeLeft <= 0) {
+          stopTimer()
+          removeTimer(timer.id)
+        }
+        return newTime;
+      })
     }, [1000])
 
     setTimerInterval(interval)
 
     return () => stopTimer()
   }, [])
-
-  useEffect(() => {
-    if(timeLeft <= 0) {
-      stopTimer()
-      removeTimer(timer.id)
-    }
-
-    return () => stopTimer()
-  }, [timeLeft])
 
   const stopTimer = () => timerInterval && clearInterval(timerInterval)
 
