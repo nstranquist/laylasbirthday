@@ -39,6 +39,8 @@ const StyledProfileDisplay = styled.div`
   border-radius: 1px;
   z-index: 1001;
   pointer-events: all !important;
+  overflow-y: auto;
+  padding-bottom: 2rem;
 
   .close-profile {
     position: fixed;

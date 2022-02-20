@@ -5,6 +5,7 @@ import { levels } from './FarmTown'
 import { crops } from '../data/cropsWiki'
 import { brownColors } from '../style/colors'
 import styleConstants from '../utils/style_constants'
+import { AudioPlayer } from './AudioPlayer'
 
 export const codesMap = {
   0: 'empty',
@@ -33,7 +34,10 @@ export const RightSidebar = ({
   selectInventorySlot,
   sellSlot,
   feedTazSlot,
-  getPresent
+  getPresent,
+  songUrl,
+  goBack,
+  goForward
 }) => {
 
   const getCropImage = code => {
@@ -114,6 +118,11 @@ export const RightSidebar = ({
           </div>
           {/* Level Container */}
           {getLevelText(xp, currentLevel)}
+          <AudioPlayer
+            songUrl={songUrl}
+            goBack={goBack}
+            goForward={goForward}
+          />
         </div>
       </div>
       <div className="right-sidebar-backpack">

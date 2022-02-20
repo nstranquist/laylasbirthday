@@ -3,7 +3,8 @@ import { brownColors } from '../../style/colors'
 import { crops } from '../../data/cropsWiki'
 
 export const CropsDisplay = ({
-  closeDisplay
+  closeDisplay,
+  currentLevel
 }) => {
 
   return (
@@ -13,20 +14,25 @@ export const CropsDisplay = ({
       </div>
       <div className="container">
         <h1>Crops</h1>
-        {Object.entries(crops).filter(([key,_]) => key !== 'empty').map(([key, crop]) => (
-          <div className="crop-display-item" key={crop.id}>
-            <div className="crop-display-item-left">
-              <crop.SvgImage height={200} width={200} />
+        {Object.entries(crops).filter(([key,_]) => key !== 'empty').map(([key, crop]) => {
+          if(currentLevel < crops[key].level) {
+            crop.name = '???'
+            crop.desc = '???'
+          }
+          return (
+            <div className="crop-display-item" key={crop.id}>
+              <div className="crop-display-item-left">
+                <crop.SvgImage height={200} width={200} />
+              </div>
+              <div className="crop-display-item-right">
+                <h3 className="crop-title">{crop.name}</h3>
+                <p className="display-body-text">
+                  {crop.desc}
+                </p>
+              </div>
             </div>
-            <div className="crop-display-item-right">
-              <h3 className="crop-title">{crop.name}</h3>
-              <p className="display-body-text">
-                {crop.desc}
-              </p>
-              <p style={{margin:0,marginBottom:'.35rem'}}>LOL, did not get this far</p>
-            </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </StyledCropsDisplay>
   )

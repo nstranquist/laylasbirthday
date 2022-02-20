@@ -26,6 +26,7 @@ import { Timer } from './Timer'
 import { SvgButton } from './SvgButton'
 import { ReactComponent as BackpackSvg } from '../assets/ui-icons/backpack.svg'
 import { PresentDisplay } from './displays/Present.jsx'
+import { AudioPlayer } from './AudioPlayer.jsx'
 
 // levels by amount of xp. level[0] = xp at level 1, which is 0xp
 // at most 2 levels in between a new unlock
@@ -117,9 +118,10 @@ const FarmTown = ({
 
   const [cropIndex, setCropIndex] = useState(0)
 
-  // useEffect(() => {
-  //   console.log('timers:', timers)
-  // }, [timers])
+  const [playlistIndex, setPlaylistIndex] = useState(0)
+  const [crankThat, setCrankThat] = useState(null)
+  const [savage, setSavage] = useState(null)
+  const [easyOnMe, setEasyOnMe] = useState(null)
 
   useEffect(() => {
     const getCurrentLevel = (xp) => {
@@ -238,12 +240,22 @@ const FarmTown = ({
                 // set the image to state
                 setProfileUrl(imageResult)
               }
+              else if(key === 'crank-that.mp3' || key.split('.')[0] === 'crank-that') {
+                setCrankThat(imageResult)
+              }
+              else if(key === 'savage.mp3' || key.split('.')[0] === 'savage') {
+                setSavage(imageResult)
+              }
+              else if(key === 'easy-on-me.mp3' || key.split('.')[0] === 'easy-on-me') {
+                setEasyOnMe(imageResult)
+              }
               else {
                 setUserImages(prev => ([
                   ...prev,
                   {key, file: imageResult}
                 ]))
               }
+              console.log('crankthat:', crankThat)
             } catch (error) {
               console.error('error in individual file retrieval:', error)
               toast.error(`There was an error getting your file: ${key}`)
@@ -288,6 +300,13 @@ const FarmTown = ({
       }, ANIMATED_TEXT_DURATION)
     }
   }, [animatedText])
+
+  const goBack = () => {
+    setPlaylistIndex(prev => prev === 0 ? 2 : prev - 1)
+  }
+  const goForward = () => {
+    setPlaylistIndex(prev => prev === 2 ? 0 : prev + 1)
+  }
 
   // User API update
   const saveUserState = async (xp, gold, inventory, tiles) => { // ['userState', 'inventory', 'tiles']
@@ -552,22 +571,21 @@ const FarmTown = ({
     }
   }
 
-  // const uploadFile = async e => {
-  //   const file = e.target.files[0]
-  //   if(!file) return;
-  //   try {
-  //     await Storage.put(file.name, file)
-  //   } catch (error) {
-  //     console.error('error uploading file:', error)
-  //   }
-  // }
+  const getSongUrl = (playlistIndex) => {
+    if(playlistIndex === 0)
+      return crankThat;
+    else if(playlistIndex === 1)
+      return savage;
+    else if(playlistIndex === 2)
+      return easyOnMe
+  }
 
   return (
     <StyledFarmTown className={classnames({'no-pointer-events': showHelp || showProfile || showCrops || showBuildings})}>
       
-      {showHelp && <HelpDisplay closeHelp={closeHelp} />}
+      {showHelp && <HelpDisplay username={user?.username} closeHelp={closeHelp} />}
       {showProfile && <ProfileDisplay userImages={userImages} closeProfile={closeProfile} />}
-      {showCrops && <CropsDisplay closeDisplay={() => setShowCrops(false)} />}
+      {showCrops && <CropsDisplay currentLevel={currentLevel} closeDisplay={() => setShowCrops(false)} />}
       {showBuildings && <BuildingsDisplay closeDisplay={() => setShowBuildings(false)} />}
       {present && showPresentDisplay && <PresentDisplay present={present} closeDisplay={() => setShowPresentDisplay(false)} />}
 
@@ -607,6 +625,9 @@ const FarmTown = ({
               getPresent={getPresent}
               sellSlot={sellInventorySlot}
               feedTazSlot={feedTazSlot}
+              songUrl={getSongUrl(playlistIndex)}
+              goBack={goBack}
+              goForward={goForward}
             />
           )}
 
